@@ -22,11 +22,11 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 import static com.google.android.gms.location.GeofencingRequest.*;
 
-public class MainActivity extends AppCompatActivity
+public class RequestPermissionsActivity extends AppCompatActivity
 {
 
 private static final String CLASSTAG =
-    " " + MainActivity.class.getSimpleName () + " ";
+    " " + RequestPermissionsActivity.class.getSimpleName () + " ";
 private static final int REQUEST_CODE_PERMISSIONS = 101;
 private GeofencingClient geofencingClient;
 private Button btnPermissions;
@@ -154,7 +154,7 @@ private void requestLocationPermission ()
   {
     Log.v ( Constants.LOGTAG,
         CLASSTAG + "ACCESS_FINE_LOCATION already granted for foreground" );
-    boolean background = false;
+    boolean background = true;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
     {
       background = ActivityCompat.
@@ -168,15 +168,15 @@ private void requestLocationPermission ()
       handleLocationUpdates ();
     } else
     {
-      Log.v ( Constants.LOGTAG,
-          CLASSTAG + "Requesting permission: ACCESS_BACKGROUND_LOCATION" );
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
       {
+        Log.v ( Constants.LOGTAG,
+            CLASSTAG + "Requesting permission: ACCESS_BACKGROUND_LOCATION" );
         ActivityCompat.requestPermissions(this,
             new String [] {ACCESS_BACKGROUND_LOCATION}, REQUEST_CODE_PERMISSIONS);
       }
     }
-  } else
+  } else // Foreground permission not already granted
   {
     Log.v ( Constants.LOGTAG,
         CLASSTAG + "Requesting permissions: " +
@@ -186,6 +186,10 @@ private void requestLocationPermission ()
       ActivityCompat.requestPermissions(this,
           new String [] {ACCESS_FINE_LOCATION, ACCESS_BACKGROUND_LOCATION},
           REQUEST_CODE_PERMISSIONS );
+    } else
+    {
+      ActivityCompat.requestPermissions(this,
+          new String [] {ACCESS_FINE_LOCATION}, REQUEST_CODE_PERMISSIONS );
     }
   }
   Log.v (Constants.LOGTAG, CLASSTAG + "<requestLocationPermission");

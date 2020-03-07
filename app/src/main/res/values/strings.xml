@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Android Geofences</string>
+    <string name="button_request_permissions">Request Location Permissions</string>
 </resources>
