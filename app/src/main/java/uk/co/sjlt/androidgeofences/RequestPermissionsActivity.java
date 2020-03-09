@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.google.android.gms.location.LocationServices;
 
 import org.jetbrains.annotations.Contract;
 
+import java.lang.Class;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +85,7 @@ protected void onCreate (Bundle savedInstanceState)
   {
     // No permissions required.
     initialiseGeofencing ();
+    transitionTo (DisplayLocationActivity.class);
   }
 }
 
@@ -137,6 +140,7 @@ public void onRequestPermissionsResult ( int requestCode,
       }
       // We have some / all permisissions so we can initialise the geofencing
       initialiseGeofencing ();
+      transitionTo (DisplayLocationActivity.class);
     } else
     {
       createInadequatePermissionsDialog ();
@@ -269,6 +273,11 @@ private void requestLocationPermissions (@NonNull String [] permissions)
 {
   ActivityCompat.requestPermissions (this, permissions,
       REQUEST_CODE_PERMISSIONS );
+}
+
+private void transitionTo (Class activityClass)
+{
+  startActivity (new Intent (this, activityClass));
 }
 
 }

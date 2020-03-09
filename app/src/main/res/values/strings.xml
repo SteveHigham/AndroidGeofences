@@ -11,4 +11,7 @@
         This application cannot run without requesting its location.
         The application will now terminate.
     </string>
+
+    <!-- Display Locations Screen -->
+    <string name="button_display_location">Get Current location</string>
 </resources>
