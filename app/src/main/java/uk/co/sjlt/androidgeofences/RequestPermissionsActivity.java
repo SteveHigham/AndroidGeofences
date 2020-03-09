@@ -1,16 +1,16 @@
 package uk.co.sjlt.androidgeofences;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -43,8 +43,11 @@ public class RequestPermissionsActivity extends AppCompatActivity
 private static final String CLASSTAG =
     " " + RequestPermissionsActivity.class.getSimpleName () + " ";
 private static final int REQUEST_CODE_PERMISSIONS = 101;
-private GeofencingClient geofencingClient;
+
 private Button btnPermissions;
+AlertDialog inadequatePermissionsDialog;
+
+private GeofencingClient geofencingClient;
 
 @Override
 protected void onCreate (Bundle savedInstanceState)
@@ -136,11 +139,26 @@ public void onRequestPermissionsResult ( int requestCode,
       initialiseGeofencing ();
     } else
     {
-      // We have no permissions. Notify the user and terminate.
-      // We musn't block the main thread so we fire the dialog and return.
-      // todo Add dialog
+      createInadequatePermissionsDialog ();
+      inadequatePermissionsDialog.show ();
     }
   }
+}
+
+private void createInadequatePermissionsDialog ()
+{
+  inadequatePermissionsDialog =  new AlertDialog.Builder (this)
+      .setTitle (R.string.inadequate_permissions_title)
+      .setMessage (R.string.inadequate_permissions_message)
+      .setPositiveButton (R.string.ok, new DialogInterface.OnClickListener ()
+      {
+        @Override
+        public void onClick (DialogInterface dialog, int which)
+        {
+          handleCloseInadequatePermissionsDialog ();
+        }
+      })
+      .create ();
 }
 
 private void handleAllLocationUpdates ()
@@ -149,6 +167,19 @@ private void handleAllLocationUpdates ()
   GeofencesApplication app = (GeofencesApplication) getApplication ();
   app.setHasForegroundLocationPermission (true);
   app.setHasBackgroundLocationPermission (true);
+}
+
+/**
+ * This method hadles the OK button response to the
+ * InadequatePermissionsDialog.
+ * We dismiss the dialog and shut down the application as it is useless
+ * without any location permissions.
+ */
+private void handleCloseInadequatePermissionsDialog ()
+{
+  inadequatePermissionsDialog.dismiss ();
+  inadequatePermissionsDialog = null;
+  finish ();
 }
 
 private void handleForegroundLocationUpdatesOnly ()

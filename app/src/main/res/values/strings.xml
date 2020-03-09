@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Android Geofences</string>
+
+    <!-- Generic Strings -->
+    <string name="ok">OK</string>
+
+    <!-- Request Permissions Screen -->
     <string name="button_request_permissions">Request Location Permissions</string>
+    <string name="inadequate_permissions_title">Inadequate Application Permissions</string>
+    <string name="inadequate_permissions_message">
+        This application cannot run without requesting its location.
+        The application will now terminate.
+    </string>
 </resources>
