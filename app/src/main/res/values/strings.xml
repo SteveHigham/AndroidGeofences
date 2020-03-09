@@ -14,4 +14,10 @@
 
     <!-- Display Locations Screen -->
     <string name="button_display_location">Get Current location</string>
+
+    <!-- Broadcast Receiver -->
+    <string name="receiver_log_transition">%1$s event on Fence: %2$s</string>
+    <string name="receiver_enter_transition">ENTER</string>
+    <string name="receiver_exit_transition">EXIT</string>
+    <string name="receiver_unknown_transition">UNKNOWN</string>
 </resources>
