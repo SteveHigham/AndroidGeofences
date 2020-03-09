@@ -22,6 +22,16 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 import static com.google.android.gms.location.GeofencingRequest.*;
 
+/**
+ * This is the first screen which is run on application start up.
+ * It's purpose is to request any desired permissions.
+ * We need to worry about ACCESS_FINE_LOCATION. Without this the app is
+ * useless and should terminate.
+ * Before Android 10 (Android Q) this permission is sufficient for foreground
+ * and background location access. From 10 / Q onwards an additional
+ * permission (ACCESS_BACKGROUND_LOCATION) is required for background
+ * location access. We can manage without this with reduced functionality.
+ */
 public class RequestPermissionsActivity extends AppCompatActivity
 {
 
@@ -36,6 +46,9 @@ protected void onCreate (Bundle savedInstanceState)
 {
   super.onCreate (savedInstanceState);
   setContentView (R.layout.activity_request_permissions);
+
+  // First priority is to check permissions. If we already have all the
+  // permissions we desire then no user interaction is required.
 
   btnPermissions = findViewById (R.id.btnPermissions);
   btnPermissions.setOnClickListener ( new View.OnClickListener ()
