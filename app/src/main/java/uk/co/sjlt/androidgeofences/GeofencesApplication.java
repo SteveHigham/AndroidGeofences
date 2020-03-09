@@ -6,7 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Main AndroidGeofences application object
+ * Main AndroidGeofences application object.
+ * I use hasXxxPermission boolean variables to force Lombok to create hasXxx
+ * getters, otherwise Lombok defaults to isXxx getters.
+ * Kind of works. Now we have isHas... getters. I thgink this will be fixed
+ * in a future Lombok release.
  */
 public class GeofencesApplication extends Application
 {
@@ -17,7 +21,7 @@ public class GeofencesApplication extends Application
  */
 @Getter
 @Setter
-private boolean foregroundLocationPermission;
+private boolean hasForegroundLocationPermission;
 
 /**
  * Identifies whether we have the background location permission.
@@ -27,7 +31,7 @@ private boolean foregroundLocationPermission;
  */
 @Getter
 @Setter
-private boolean backgroundLocationPermission;
+private boolean hasBackgroundLocationPermission;
 }
 
 // End of class.
