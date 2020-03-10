@@ -5,32 +5,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import android.app.PendingIntent;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-
 import org.jetbrains.annotations.Contract;
 
-import java.lang.Class;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.Manifest.permission.*;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
-import static com.google.android.gms.location.GeofencingRequest.*;
 
 /**
  * This is the first screen which is run on application start up.
@@ -50,15 +38,19 @@ private static final String CLASSTAG =
 private static final int REQUEST_CODE_PERMISSIONS = 101;
 
 private Button btnPermissions;
-AlertDialog addingFenceFailedDialog;
-AlertDialog inadequatePermissionsDialog;
+private AlertDialog inadequatePermissionsDialog;
 
-// private GeofencingClient geofencingClient;
+/**
+ * This is a flag for the onResume lifecycle callback to indicate that the permissions request
+ * cycle has completed.
+ */
+// private boolean permissionsGranted;
 
 @Override
 protected void onCreate (Bundle savedInstanceState)
 {
   super.onCreate (savedInstanceState);
+  Log.v (Constants.LOGTAG, CLASSTAG + "onCreate called");
   setContentView (R.layout.activity_request_permissions);
 
   // First priority is to check permissions. If we already have all the
@@ -89,7 +81,6 @@ protected void onCreate (Bundle savedInstanceState)
   {
     // No permissions required.
     initialiseGeofencing ();
-    transitionTo (DisplayLocationActivity.class);
   }
 }
 
@@ -99,6 +90,7 @@ public void onRequestPermissionsResult ( int requestCode,
                                          @NonNull int [] grantResults )
 {
   super.onRequestPermissionsResult (requestCode, permissions, grantResults);
+  Log.v (Constants.LOGTAG, CLASSTAG + "onRequestPermissionsResult called");
 
   // Ignore any calls which are not related to REQUEST_CODE_PERMISSIONS
   if (requestCode == REQUEST_CODE_PERMISSIONS)
@@ -144,7 +136,6 @@ public void onRequestPermissionsResult ( int requestCode,
       }
       // We have some / all permisissions so we can initialise the geofencing
       initialiseGeofencing ();
-      transitionTo (DisplayLocationActivity.class);
     } else
     {
       createInadequatePermissionsDialog ();
@@ -153,19 +144,22 @@ public void onRequestPermissionsResult ( int requestCode,
   }
 }
 
-private void createAddingFenceFailedDialog ()
+/**
+ * This caters for the use case where the add fences initially fails. The user
+ * then fixes the problem (device not allowing fine location) and returns to
+ * the app. At this point this lifecycle action is called.
+ */
+@Override
+public void onResume ()
 {
-  addingFenceFailedDialog = new AlertDialog.Builder (this)
-      .setTitle (R.string.adding_fence_failed_title)
-      .setPositiveButton (R.string.ok, new DialogInterface.OnClickListener ()
-      {
-        @Override
-        public void onClick (DialogInterface dialog, int which)
-        {
-          handleCloseAddingFenceFailedDialog ();
-        }
-      })
-      .create ();
+  super.onResume ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onResume called");
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+  if ( app.isGeofencingInitialised () &&
+      (app.getStatus () ==  GeofencesApplication.Status.DEFAULT) )
+  {
+    app.addFences (this);
+  }
 }
 
 private void createInadequatePermissionsDialog ()
@@ -184,29 +178,12 @@ private void createInadequatePermissionsDialog ()
       .create ();
 }
 
-private void handleAddingFenceFailed (Exception e)
-{
-  String msg = CLASSTAG + "Adding fence failed: " + e.getMessage ();
-  Log.e (Constants.LOGTAG, msg, e);
-}
-
 private void handleAllLocationUpdates ()
 {
   // foreground and background enabled.
   GeofencesApplication app = (GeofencesApplication) getApplication ();
   app.setHasForegroundLocationPermission (true);
   app.setHasBackgroundLocationPermission (true);
-}
-
-/**
- * This method hadles the OK button response to the
- * AddingFenceFailedDialog.
- * We dismiss the dialog.
- */
-private void handleCloseAddingFenceFailedDialog ()
-{
-  addingFenceFailedDialog.dismiss ();
-  addingFenceFailedDialog = null;
 }
 
 /**
@@ -231,48 +208,8 @@ private void handleForegroundLocationUpdatesOnly ()
 
 private void initialiseGeofencing ()
 {
-  GeofencingClient client = LocationServices.getGeofencingClient(this);
-
-  // 50 metre geofence centred on Steve's House
-  Geofence fence =  new Geofence.Builder ()
-      .setRequestId ("Steve's House")
-      .setCircularRegion (53.324859d, -1.990568d, 50f)
-      .setExpirationDuration (NEVER_EXPIRE)
-      .setTransitionTypes ( Geofence.GEOFENCE_TRANSITION_ENTER |
-          Geofence.GEOFENCE_TRANSITION_EXIT )
-      .build ();
-
-  // Build the Geofencing request
-  GeofencingRequest request = new GeofencingRequest. Builder ()
-      .setInitialTrigger (INITIAL_TRIGGER_DWELL | INITIAL_TRIGGER_ENTER |
-          INITIAL_TRIGGER_EXIT)
-      .addGeofence (fence)
-      .build ();
-
-  // Create the PendingIntent
-  Intent intent = new Intent (this, GeofenceBroadcastReceiver.class);
-  PendingIntent pendingIntent =
-      PendingIntent.getBroadcast (this, 0, intent,
-          PendingIntent.FLAG_UPDATE_CURRENT );
-
-  // Add the geofence
-  client.addGeofences (request, pendingIntent)
-      .addOnSuccessListener (this, new OnSuccessListener<Void> ()
-      {
-        @Override
-        public void onSuccess (Void aVoid)
-        {
-          Log.i (Constants.LOGTAG, CLASSTAG + "Fence added.");
-        }
-      })
-      .addOnFailureListener (this, new OnFailureListener ()
-      {
-        @Override
-        public void onFailure (Exception e)
-        {
-          handleAddingFenceFailed (e);
-        }
-      });
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+  app.initGeofencing (this);
 }
 
 /**
@@ -334,11 +271,6 @@ private void requestLocationPermissions (@NonNull String [] permissions)
 {
   ActivityCompat.requestPermissions (this, permissions,
       REQUEST_CODE_PERMISSIONS );
-}
-
-private void transitionTo (Class activityClass)
-{
-  startActivity (new Intent (this, activityClass));
 }
 
 }
