@@ -6,6 +6,7 @@
 
     <!-- Request Permissions Screen -->
     <string name="button_request_permissions">Request Location Permissions</string>
+    <string name="adding_fence_failed_title">Adding Fence(s) Failed</string>
     <string name="inadequate_permissions_title">Inadequate Application Permissions</string>
     <string name="inadequate_permissions_message">
         This application cannot run without requesting its location.
