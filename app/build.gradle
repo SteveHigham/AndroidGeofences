@@ -20,7 +20,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile ('proguard-android-optimize.txt'),
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
         }
     }
@@ -29,9 +29,10 @@ android {
 
 dependencies {
     // Lombok
+    implementation 'com.google.android.material:material:1.1.0'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     //noinspection AnnotationProcessorOnCompilePath
-    compileOnly         'org.projectlombok:lombok:1.18.12'
+    compileOnly 'org.projectlombok:lombok:1.18.12'
 
     // Standard implementation dependencies from the new project wizard
     implementation fileTree(dir: 'libs', include: ['*.jar'])
