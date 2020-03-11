@@ -1,9 +1,11 @@
 package uk.co.sjlt.androidgeofences;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,11 +18,20 @@ public class DisplayLocationActivity extends AppCompatActivity
 private static final String CLASSTAG =
     " " + DisplayLocationActivity.class.getSimpleName () + " ";
 
+private TextView status;
+private TextView coarsePermission;
+private TextView finePermission;
+private TextView backgroundPermission;
+
 @Override
 protected void onCreate (Bundle savedInstanceState)
 {
   super.onCreate (savedInstanceState);
   setContentView (R.layout.activity_display_location);
+  status                = findViewById (R.id.status_value);
+  coarsePermission      = findViewById (R.id.coarse_permission_value);
+  finePermission        = findViewById (R.id.fine_permission_value);
+  backgroundPermission  = findViewById (R.id.background_permission_value);
 }
 
 @Override
@@ -64,6 +75,23 @@ public void onResume ()
   {
     app.addFences (this);
   }
+  refreshScreen ();
+}
+
+private void refreshScreen ()
+{
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+  status.setText (app.getStatusText ());
+  Resources res = getResources ();
+  String text = res.getString ( app.isHasCoarseLocationPermission () ?
+      R.string.permission_granted : R.string.permission_withheld );
+  coarsePermission.setText (text);
+  text = res.getString ( app.isHasFineLocationPermission () ?
+      R.string.permission_granted : R.string.permission_withheld );
+  finePermission.setText (text);
+  text = res.getString ( app.isHasBackgroundLocationPermission () ?
+      R.string.permission_granted : R.string.permission_withheld );
+  backgroundPermission.setText (text);
 }
 
 }

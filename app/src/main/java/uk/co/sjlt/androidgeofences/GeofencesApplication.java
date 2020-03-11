@@ -109,6 +109,31 @@ public void onCreate ()
   status = Status.DEFAULT;
 }
 
+public @NotNull String getStatusText ()
+{
+  Log.v (Constants.LOGTAG, CLASSTAG + "Requesting status text for status: " + status);
+  int resId;
+  switch (status)
+  {
+    case DEFAULT:
+      resId = R.string.status_default;
+      break;
+    case FENCES_ADDED:
+      resId = R.string.status_fences_added;
+      break;
+    case FENCES_FAILED:
+      resId = R.string.status_fences_failed;
+      break;
+    case FENCES_REMOVED:
+      resId = R.string.status_fences_removed;
+    default:
+      resId = R.string.status_unknown;
+  }
+  String result = getResources ().getString (resId);
+  Log.v (Constants.LOGTAG, CLASSTAG + "Returning status text: " + result);
+  return result;
+}
+
 public boolean isDialogActive () { return dialogActivity != null; }
 
 public boolean isGeofencingInitialised () { return geofencingClient != null; }

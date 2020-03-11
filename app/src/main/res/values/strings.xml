@@ -24,6 +24,11 @@
     <string name="geofence_too_many_pending_intents">
         We have provided more than 5 PendingIntents (internal error)
     </string>
+    <string name="status_default">DEFAULT</string>
+    <string name="status_fences_added">Fences added</string>
+    <string name="status_fences_failed">Adding fences failed</string>
+    <string name="status_fences_removed">Fences removed</string>
+    <string name="status_unknown">UNKNOWN STATUS</string>
 
     <!-- Request Permissions Screen -->
     <string name="button_request_permissions">Request Location Permissions</string>
@@ -35,6 +40,12 @@
     </string>
 
     <!-- Display Locations Screen -->
+    <string name="status_label">Status</string>
+    <string name="coarse_permission_label">Coarse location access</string>
+    <string name="fine_permission_label">Fine location access</string>
+    <string name="background_permission_label">Background loc. access</string>
+    <string name="permission_granted">Granted</string>
+    <string name="permission_withheld">Withheld</string>
     <string name="button_display_location">Get Current location</string>
 
     <!-- Broadcast Receiver -->
@@ -43,14 +54,5 @@
     <string name="receiver_exit_transition">EXIT</string>
     <string name="receiver_unknown_transition">UNKNOWN</string>
     <string name="title_activity_test">Test Activity</string>
-    <!-- Strings used for fragments for navigation -->
-    <!--
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    -->
 </resources>

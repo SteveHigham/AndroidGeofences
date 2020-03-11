@@ -124,6 +124,10 @@ public void onRequestPermissionsResult ( int requestCode,
 
     if (coarsePermission || finePermission)
     {
+      // Background permission is true for API's before Android 10 / Q
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+      { backgroundPermission = true; }
+
       if (backgroundPermission)
       {
         handleAllLocationUpdates (coarsePermission, finePermission);
@@ -239,6 +243,11 @@ private List<String> permissionsDesired ()
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
     { result.add (ACCESS_BACKGROUND_LOCATION); }
   }
+
+  // We need to cater for the case where no permissions are requested and the
+  // API is before 10 / Q.
+  if (result.isEmpty () && (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q))
+  { app.setHasBackgroundLocationPermission (true); }
 
   Log.v ( Constants.LOGTAG,
     CLASSTAG + "permissionsDesired returns: " + result.toString () );
