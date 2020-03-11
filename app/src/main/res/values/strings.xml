@@ -46,7 +46,10 @@
     <string name="background_permission_label">Background loc. access</string>
     <string name="permission_granted">Granted</string>
     <string name="permission_withheld">Withheld</string>
+
     <string name="button_display_location">Get Current location</string>
+
+    <string name="latitude_label">Latitude</string>
 
     <!-- Broadcast Receiver -->
     <string name="receiver_log_transition">%1$s event on Fence: %2$s</string>

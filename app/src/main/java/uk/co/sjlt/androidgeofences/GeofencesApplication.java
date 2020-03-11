@@ -6,18 +6,22 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.location.Location;
 import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -50,6 +54,7 @@ private static final String CLASSTAG =
  */
 public enum Status { DEFAULT, FENCES_ADDED, FENCES_FAILED, FENCES_REMOVED }
 
+private FusedLocationProviderClient fusedLocationClient;
 private GeofencingClient geofencingClient;
 
 /**
@@ -109,6 +114,12 @@ public void onCreate ()
   status = Status.DEFAULT;
 }
 
+public Task<Location> getLastLocation ()
+{ return fusedLocationClient.getLastLocation (); }
+
+public Task<LocationAvailability> getLocationAvailability ()
+{ return fusedLocationClient.getLocationAvailability (); }
+
 public @NotNull String getStatusText ()
 {
   Log.v (Constants.LOGTAG, CLASSTAG + "Requesting status text for status: " + status);
@@ -147,6 +158,10 @@ public void initGeofencing (Activity activity)
 {
   if (! isGeofencingInitialised ())
   {
+    // Initialise the Fused Location Client
+    fusedLocationClient = LocationServices.getFusedLocationProviderClient (this);
+
+    // Initialise the geofencing
     geofencingClient = LocationServices.getGeofencingClient (this);
     Intent intent = new Intent (this, GeofenceBroadcastReceiver.class);
     pendingIntent =
