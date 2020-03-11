@@ -5,11 +5,14 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
@@ -160,12 +163,12 @@ public void addFences (Activity activity)
       });
 }
 
-private void createAddingFenceFailedDialog ()
+private void createAddingFenceFailedDialog (String msg)
 {
   Log.v (Constants.LOGTAG, CLASSTAG + ">createAddingFenceFailedDialog");
   addingFenceFailedDialog = new AlertDialog.Builder (dialogActivity)
       .setTitle (R.string.adding_fence_failed_title)
-      .setMessage ("")
+      .setMessage (msg)
       .setPositiveButton (R.string.ok, new DialogInterface.OnClickListener ()
       {
         @Override
@@ -179,9 +182,45 @@ private void createAddingFenceFailedDialog ()
 
 private void handleAddingFenceFailed (Exception e)
 {
-  String msg = CLASSTAG + "Adding fence failed: " + e.getMessage ();
-  Log.w (Constants.LOGTAG, msg, e);
-  createAddingFenceFailedDialog ();
+  String logMsg = CLASSTAG + "Adding fence failed: " + e.getLocalizedMessage ();
+  Log.w (Constants.LOGTAG, logMsg, e);
+  String msg;
+  Resources res = getResources ();
+  if (e instanceof ApiException)
+  {
+    int code = ((ApiException) e).getStatusCode ();
+    switch (code)
+    {
+      case 1004:  // GeofenceStatusCodes.GEOFENCE_INSUFFICIENT_LOCATION_PERMISSION
+        msg = res.getString ( R.string.failed_with_error_code, code,
+            res.getString (R.string.geofence_insufficient_location_permission) );
+        break;
+      case GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE:
+        msg = res.getString ( R.string.failed_with_error_code, code,
+            res.getString (R.string.geofence_not_available) );
+        break;
+      case 1005: //GeofenceStatusCodes.GEOFENCE_REQUEST_TOO_FREQUENT
+        msg = res.getString ( R.string.failed_with_error_code, code,
+            res.getString (R.string.geofence_request_too_frequent) );
+        break;
+      case GeofenceStatusCodes.GEOFENCE_TOO_MANY_GEOFENCES:
+        msg = res.getString ( R.string.failed_with_error_code, code,
+            res.getString (R.string.geofence_too_many_geofences) );
+        break;
+      case GeofenceStatusCodes.GEOFENCE_TOO_MANY_PENDING_INTENTS:
+        msg = res.getString ( R.string.failed_with_error_code, code,
+            res.getString (R.string.geofence_too_many_pending_intents) );
+        break;
+      default:
+        msg = res.getString ( R.string.failed_with_error_code, code,
+            e.getLocalizedMessage () );
+    }
+  } else
+  {
+    msg = res.getString ( R.string.failed_with_unexpected_error,
+        e.getLocalizedMessage () );
+  }
+  createAddingFenceFailedDialog (msg);
   addingFenceFailedDialog.show ();
 }
 

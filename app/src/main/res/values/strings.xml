@@ -4,6 +4,27 @@
     <!-- Generic Strings -->
     <string name="ok">OK</string>
 
+    <!-- Geofences Application -->
+    <string name="failed_with_error_code">Failed with error code %1$d (%2$s)</string>
+    <string name="failed_with_unexpected_error">
+        Failed with unexpected error: %1$s
+    </string>
+    <string name="geofence_insufficient_location_permission">
+        The app has insufficient permissions for geofencing
+    </string>
+    <string name="geofence_not_available">
+        The Geofence Service is not available
+    </string>
+    <string name="geofence_request_too_frequent">
+        We are adding Geofences too frequently
+    </string>
+    <string name="geofence_too_many_geofences">
+        We have registered more than 100 geofences
+    </string>
+    <string name="geofence_too_many_pending_intents">
+        We have provided more than 5 PendingIntents (internal error)
+    </string>
+
     <!-- Request Permissions Screen -->
     <string name="button_request_permissions">Request Location Permissions</string>
     <string name="adding_fence_failed_title">Adding Fence(s) Failed</string>
@@ -23,6 +44,7 @@
     <string name="receiver_unknown_transition">UNKNOWN</string>
     <string name="title_activity_test">Test Activity</string>
     <!-- Strings used for fragments for navigation -->
+    <!--
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
@@ -30,4 +52,5 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    -->
 </resources>
