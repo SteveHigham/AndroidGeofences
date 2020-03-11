@@ -198,7 +198,6 @@ private void handleAllLocationUpdates ()
  */
 private void handleCloseInadequatePermissionsDialog ()
 {
-  inadequatePermissionsDialog.dismiss ();
   inadequatePermissionsDialog = null;
   finish ();
 }

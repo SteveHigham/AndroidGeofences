@@ -200,7 +200,6 @@ private void handleAddingFenceSucceeded ()
 private void handleCloseAddingFenceFailedDialog ()
 {
   Log.v (Constants.LOGTAG, CLASSTAG + "handleCloseAddingFenceFailedDialog called");
-  addingFenceFailedDialog.dismiss ();
   addingFenceFailedDialog = null;
   Log.v (Constants.LOGTAG, CLASSTAG + "Now terminate");
    Activity activity = dialogActivity;
