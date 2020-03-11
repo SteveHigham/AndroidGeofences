@@ -71,7 +71,20 @@ private boolean hasBackgroundLocationPermission;
 @Getter
 private Status status;
 
+/**
+ * This holds the dialog object whilst the dialog is active.
+ * At other times the value is null.
+ */
 private AlertDialog addingFenceFailedDialog;
+/**
+ * This holds the dialog's parent activity from the point the fence addition
+ * is requested to the point the result has been handled. This avoids problems
+ * passing the activity into an inner class for the handlers.
+ * At other times the value is null.
+ */
+private Activity dialogActivity;
+
+
 private PendingIntent pendingIntent;
 
 /**
@@ -83,8 +96,10 @@ public void onCreate ()
 {
   super.onCreate ();
   Log.v (Constants.LOGTAG, CLASSTAG + "Application onCreate called");
-  status = status.DEFAULT;
+  status = Status.DEFAULT;
 }
+
+public boolean isDialogActive () { return dialogActivity != null; }
 
 public boolean isGeofencingInitialised () { return geofencingClient != null; }
 
@@ -106,7 +121,7 @@ public void initGeofencing (Activity activity)
   }
 }
 
-public void addFences (final Activity activity)
+public void addFences (Activity activity)
 {
   // 50 metre geofence centred on Steve's House
   Geofence fence =  new Geofence.Builder ()
@@ -125,6 +140,7 @@ public void addFences (final Activity activity)
       .build ();
 
   // Add the geofence
+  dialogActivity = activity;
   geofencingClient.addGeofences (request, pendingIntent)
       .addOnSuccessListener (activity, new OnSuccessListener<Void> ()
       {
@@ -139,15 +155,15 @@ public void addFences (final Activity activity)
         @Override
         public void onFailure (@NotNull Exception e)
         {
-          handleAddingFenceFailed (activity, e);
+          handleAddingFenceFailed (e);
         }
       });
 }
 
-private void createAddingFenceFailedDialog (final Activity activity)
+private void createAddingFenceFailedDialog ()
 {
   Log.v (Constants.LOGTAG, CLASSTAG + ">createAddingFenceFailedDialog");
-  addingFenceFailedDialog = new AlertDialog.Builder (activity)
+  addingFenceFailedDialog = new AlertDialog.Builder (dialogActivity)
       .setTitle (R.string.adding_fence_failed_title)
       .setMessage ("")
       .setPositiveButton (R.string.ok, new DialogInterface.OnClickListener ()
@@ -155,17 +171,17 @@ private void createAddingFenceFailedDialog (final Activity activity)
         @Override
         public void onClick (DialogInterface dialog, int which)
         {
-          handleCloseAddingFenceFailedDialog (activity);
+          handleCloseAddingFenceFailedDialog ();
         }
       })
       .create ();
 }
 
-private void handleAddingFenceFailed (Activity activity, Exception e)
+private void handleAddingFenceFailed (Exception e)
 {
   String msg = CLASSTAG + "Adding fence failed: " + e.getMessage ();
   Log.w (Constants.LOGTAG, msg, e);
-  createAddingFenceFailedDialog (activity);
+  createAddingFenceFailedDialog ();
   addingFenceFailedDialog.show ();
 }
 
@@ -173,6 +189,7 @@ private void handleAddingFenceSucceeded ()
 {
   Log.i (Constants.LOGTAG, CLASSTAG + "Fence added.");
   status = Status.FENCES_ADDED;
+  dialogActivity = null;
 }
 
 /**
@@ -180,10 +197,14 @@ private void handleAddingFenceSucceeded ()
  * AddingFenceFailedDialog.
  * We dismiss the dialog.
  */
-private void handleCloseAddingFenceFailedDialog (Activity activity)
+private void handleCloseAddingFenceFailedDialog ()
 {
+  Log.v (Constants.LOGTAG, CLASSTAG + "handleCloseAddingFenceFailedDialog called");
   addingFenceFailedDialog.dismiss ();
   addingFenceFailedDialog = null;
+  Log.v (Constants.LOGTAG, CLASSTAG + "Now terminate");
+   Activity activity = dialogActivity;
+  dialogActivity = null;
   activity.finish ();
 }
 

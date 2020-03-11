@@ -22,6 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayLocationActivity" />
+
+        <receiver android:name=".GeofenceBroadcastReceiver"/>
     </application>
 
 </manifest>

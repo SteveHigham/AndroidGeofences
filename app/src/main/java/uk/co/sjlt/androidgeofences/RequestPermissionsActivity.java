@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,13 +39,12 @@ private static final String CLASSTAG =
 private static final int REQUEST_CODE_PERMISSIONS = 101;
 
 private Button btnPermissions;
-private AlertDialog inadequatePermissionsDialog;
 
 /**
- * This is a flag for the onResume lifecycle callback to indicate that the permissions request
- * cycle has completed.
+ * This holds the dialog object whilst the dialog is active.
+ * At other times the value is null.
  */
-// private boolean permissionsGranted;
+private AlertDialog inadequatePermissionsDialog;
 
 @Override
 protected void onCreate (Bundle savedInstanceState)
@@ -148,6 +148,9 @@ public void onRequestPermissionsResult ( int requestCode,
  * This caters for the use case where the add fences initially fails. The user
  * then fixes the problem (device not allowing fine location) and returns to
  * the app. At this point this lifecycle action is called.
+ *
+ * We need to block the case where onResume is called directly after
+ * onRequestPermissionsResult otherwise we end up with two dialogs!
  */
 @Override
 public void onResume ()
@@ -156,7 +159,8 @@ public void onResume ()
   Log.v (Constants.LOGTAG, CLASSTAG + "onResume called");
   GeofencesApplication app = (GeofencesApplication) getApplication ();
   if ( app.isGeofencingInitialised () &&
-      (app.getStatus () ==  GeofencesApplication.Status.DEFAULT) )
+      (app.getStatus () == GeofencesApplication.Status.DEFAULT) &&
+      ! (app.isDialogActive ()) )
   {
     app.addFences (this);
   }
