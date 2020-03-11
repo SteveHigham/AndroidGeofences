@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -139,28 +138,6 @@ public void onRequestPermissionsResult ( int requestCode,
       createInadequatePermissionsDialog ();
       inadequatePermissionsDialog.show ();
     }
-  }
-}
-
-/**
- * This caters for the use case where the add fences initially fails. The user
- * then fixes the problem (device not allowing fine location) and returns to
- * the app. At this point this lifecycle action is called.
- *
- * We need to block the case where onResume is called directly after
- * onRequestPermissionsResult otherwise we end up with two dialogs!
- */
-@Override
-public void onResume ()
-{
-  super.onResume ();
-  Log.v (Constants.LOGTAG, CLASSTAG + "onResume called");
-  GeofencesApplication app = (GeofencesApplication) getApplication ();
-  if ( app.isGeofencingInitialised () &&
-      (app.getStatus () == GeofencesApplication.Status.DEFAULT) &&
-      ! (app.isDialogActive ()) )
-  {
-    app.addFences (this);
   }
 }
 

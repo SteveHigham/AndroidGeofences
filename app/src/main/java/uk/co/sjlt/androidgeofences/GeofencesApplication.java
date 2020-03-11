@@ -48,7 +48,7 @@ private static final String CLASSTAG =
  * yet. This may have been tried and failed in which case it should be retried
  * if the app gets the focus again.
  */
-public enum Status { DEFAULT, FENCES_ADDED, FENCES_REMOVED }
+public enum Status { DEFAULT, FENCES_ADDED, FENCES_FAILED, FENCES_REMOVED }
 
 private GeofencingClient geofencingClient;
 
@@ -78,6 +78,7 @@ public boolean hasForegroundLocationPermission ()
 { return hasCoarseLocationPermission || hasFineLocationPermission; }
 
 @Getter
+@Setter
 private Status status;
 
 /**
@@ -250,9 +251,9 @@ private void handleCloseAddingFenceFailedDialog ()
 {
   Log.v (Constants.LOGTAG, CLASSTAG + "handleCloseAddingFenceFailedDialog called");
   addingFenceFailedDialog = null;
-  Log.v (Constants.LOGTAG, CLASSTAG + "Now terminate");
   Activity activity = dialogActivity;
   dialogActivity = null;
+  status = Status.FENCES_FAILED;
 
   // Transition to the Display Location screen
   startActivity (new Intent (activity, DisplayLocationActivity.class));
