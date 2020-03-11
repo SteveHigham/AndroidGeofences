@@ -53,15 +53,6 @@ public enum Status { DEFAULT, FENCES_ADDED, FENCES_REMOVED }
 private GeofencingClient geofencingClient;
 
 /**
- * Identifies whether we have the foreground location permission.
- * This will initialise to false. Without this permission the app is useless
- * and should terminate.
- */
-@Getter
-@Setter
-private boolean hasForegroundLocationPermission;
-
-/**
  * Identifies whether we have the background location permission.
  * This will initialise to false. For API's before Android 10 (Android Q) this
  * will always be set true. From 10 / Q onwards this depends on the user. We can operate
@@ -70,6 +61,21 @@ private boolean hasForegroundLocationPermission;
 @Getter
 @Setter
 private boolean hasBackgroundLocationPermission;
+
+@Getter
+@Setter
+private boolean hasCoarseLocationPermission;
+
+@Getter
+@Setter
+private boolean hasFineLocationPermission;
+
+/**
+ * Identifies whether we have the foreground location permission.
+ * Without this permission the app is useless and should terminate.
+ */
+public boolean hasForegroundLocationPermission ()
+{ return hasCoarseLocationPermission || hasFineLocationPermission; }
 
 @Getter
 private Status status;
@@ -228,7 +234,11 @@ private void handleAddingFenceSucceeded ()
 {
   Log.i (Constants.LOGTAG, CLASSTAG + "Fence added.");
   status = Status.FENCES_ADDED;
+  Activity activity = dialogActivity;
   dialogActivity = null;
+
+  // Transition to the Display Location screen
+  startActivity (new Intent (activity, DisplayLocationActivity.class));
 }
 
 /**
@@ -241,9 +251,11 @@ private void handleCloseAddingFenceFailedDialog ()
   Log.v (Constants.LOGTAG, CLASSTAG + "handleCloseAddingFenceFailedDialog called");
   addingFenceFailedDialog = null;
   Log.v (Constants.LOGTAG, CLASSTAG + "Now terminate");
-   Activity activity = dialogActivity;
+  Activity activity = dialogActivity;
   dialogActivity = null;
-  activity.finish ();
+
+  // Transition to the Display Location screen
+  startActivity (new Intent (activity, DisplayLocationActivity.class));
 }
 
 }

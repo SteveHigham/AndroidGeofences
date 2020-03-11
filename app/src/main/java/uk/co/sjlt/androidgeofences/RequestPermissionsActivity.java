@@ -97,27 +97,25 @@ public void onRequestPermissionsResult ( int requestCode,
   {
     //Context context = getApplicationContext ();
     GeofencesApplication app = (GeofencesApplication) getApplication ();
-    boolean foreground = app.isHasForegroundLocationPermission ();
-    boolean background = app.isHasBackgroundLocationPermission ();
+    //boolean foreground = app.isHasForegroundLocationPermission ();
+    boolean coarsePermission = app.isHasCoarseLocationPermission ();
+    boolean finePermission = app.isHasFineLocationPermission ();
+    boolean backgroundPermission = app.isHasBackgroundLocationPermission ();
 
     // Check all permissions and update foreground, background appropriately.
     for (int i = 0; i < permissions.length; i++)
     {
       String permission = permissions [i];
       boolean grant = grantResults [i] == PERMISSION_GRANTED;
-      if (permission.equalsIgnoreCase (ACCESS_FINE_LOCATION))
+      if (permission.equalsIgnoreCase (ACCESS_COARSE_LOCATION))
       {
-        // Foreground permission allowed
-        if (grant)
-        {
-          foreground = true;
-        }
+        coarsePermission = grant;
+      } else if (permission.equalsIgnoreCase (ACCESS_FINE_LOCATION))
+      {
+        finePermission = grant;
       } else if (permission.equalsIgnoreCase (ACCESS_BACKGROUND_LOCATION))
       {
-        if (grant)
-        {
-          foreground = background = true;
-        }
+        backgroundPermission = grant;
       } else
       {
         Log.w ( Constants.LOGTAG,
@@ -125,14 +123,14 @@ public void onRequestPermissionsResult ( int requestCode,
       }
     }
 
-    if (foreground)
+    if (coarsePermission || finePermission)
     {
-      if (background)
+      if (backgroundPermission)
       {
-        handleAllLocationUpdates ();
+        handleAllLocationUpdates (coarsePermission, finePermission);
       } else
       {
-        handleForegroundLocationUpdatesOnly ();
+        handleForegroundLocationUpdatesOnly (coarsePermission, finePermission);
       }
       // We have some / all permisissions so we can initialise the geofencing
       initialiseGeofencing ();
@@ -182,12 +180,13 @@ private void createInadequatePermissionsDialog ()
       .create ();
 }
 
-private void handleAllLocationUpdates ()
+private void handleAllLocationUpdates (boolean coarsePermission, boolean finePermission)
 {
   // foreground and background enabled.
   GeofencesApplication app = (GeofencesApplication) getApplication ();
-  app.setHasForegroundLocationPermission (true);
   app.setHasBackgroundLocationPermission (true);
+  app.setHasCoarseLocationPermission (coarsePermission);
+  app.setHasFineLocationPermission (finePermission);
 }
 
 /**
@@ -202,11 +201,13 @@ private void handleCloseInadequatePermissionsDialog ()
   finish ();
 }
 
-private void handleForegroundLocationUpdatesOnly ()
+private void handleForegroundLocationUpdatesOnly ( boolean coarsePermission,
+                                                   boolean finePermission )
 {
   // only foreground enabled.
   GeofencesApplication app = (GeofencesApplication) getApplication ();
-  app.setHasForegroundLocationPermission (true);
+  app.setHasCoarseLocationPermission (coarsePermission);
+  app.setHasFineLocationPermission (finePermission);
 }
 
 private void initialiseGeofencing ()
@@ -227,45 +228,43 @@ private void initialiseGeofencing ()
 @NonNull
 private List<String> permissionsDesired ()
 {
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+
+  app.setHasCoarseLocationPermission (
+      ActivityCompat.checkSelfPermission (this, ACCESS_COARSE_LOCATION) ==
+          PERMISSION_GRANTED );
+
+  app.setHasFineLocationPermission (
+      ActivityCompat.checkSelfPermission (this, ACCESS_FINE_LOCATION) ==
+          PERMISSION_GRANTED );
+
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+  {
+    // Android 10 / Q or higher - we would like the background permission
+    // as well
+    app.setHasBackgroundLocationPermission (
+        ActivityCompat.checkSelfPermission (this,
+            ACCESS_BACKGROUND_LOCATION) == PERMISSION_GRANTED );
+  }
+
+  // Now work out what to ask for
   List<String> result = new ArrayList<> ();
 
-  if ( ActivityCompat.checkSelfPermission (this, ACCESS_FINE_LOCATION) ==
-      PERMISSION_GRANTED )
+  if (! app.isHasCoarseLocationPermission ())
+  { result.add (ACCESS_COARSE_LOCATION); }
+
+  if (! app.isHasFineLocationPermission ())
+  { result.add (ACCESS_FINE_LOCATION); }
+
+
+  if (! app.isHasBackgroundLocationPermission ())
   {
-    // We have the foreground permission
-    GeofencesApplication app = (GeofencesApplication) getApplication ();
-    app.setHasForegroundLocationPermission (true);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-    {
-      // Android 10 / Q or higher - we would like the background permission
-      // as well
-      if (ActivityCompat.checkSelfPermission (this,
-          ACCESS_BACKGROUND_LOCATION) == PERMISSION_GRANTED)
-      {
-        app.setHasBackgroundLocationPermission (true);
-      } else
-      {
-        result.add (ACCESS_BACKGROUND_LOCATION);
-      }
-    } else
-    {
-      // Before Android 10 / Q. Therefore background location checking doesn't
-      // need any additional permissions.
-      app.setHasBackgroundLocationPermission (true);
-    }
-  } else
-  {
-    // We don't have any permissions
-    result.add (ACCESS_FINE_LOCATION);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-    {
-      // Background permission also desired for Android 10 / Q or later
-      result.add (ACCESS_BACKGROUND_LOCATION);
-    }
+    { result.add (ACCESS_BACKGROUND_LOCATION); }
   }
 
   Log.v ( Constants.LOGTAG,
-      CLASSTAG + "permissionsDesired returns: " + result.toString () );
+    CLASSTAG + "permissionsDesired returns: " + result.toString () );
 
   return result;
 }
