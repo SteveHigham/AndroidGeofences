@@ -49,7 +49,10 @@
 
     <string name="button_display_location">Get Current location</string>
 
+    <string name="title_last_location">Last Location Found</string>
     <string name="latitude_label">Latitude</string>
+    <string name="longitude_label">Longitude</string>
+    <string name="time_label">Time</string>
 
     <!-- Broadcast Receiver -->
     <string name="receiver_log_transition">%1$s event on Fence: %2$s</string>

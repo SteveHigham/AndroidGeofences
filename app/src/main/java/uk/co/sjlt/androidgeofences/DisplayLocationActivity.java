@@ -18,6 +18,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -37,7 +41,13 @@ private TextView backgroundPermission;
 
 private Button btnCurrentLocation;
 
-private ConstraintLayout positionLabels;
+private ConstraintLayout framePosition;
+
+private TextView titlePosition;
+private TextView latitude;
+private TextView longitude;
+private TextView locationTime;
+private SimpleDateFormat timeFormatter;
 
 @Override
 protected void onCreate (Bundle savedInstanceState)
@@ -52,7 +62,11 @@ protected void onCreate (Bundle savedInstanceState)
 
   btnCurrentLocation = findViewById (R.id.btnCurrentLocation);
 
-  positionLabels = findViewById (R.id.frame_position_labels);
+  framePosition   = findViewById (R.id.frame_position);
+  titlePosition   = findViewById (R.id.title_position);
+  latitude        = findViewById (R.id.latitude_value);
+  longitude       = findViewById (R.id.longitude_value);
+  locationTime    = findViewById (R.id.time_value);
 }
 
 @Override
@@ -96,8 +110,19 @@ public void onResume ()
   {
     app.addFences (this);
   }
+  // Replace the time formatter in case the Locale has changed.
+  timeFormatter =
+      new SimpleDateFormat ("dd-MMM HH:mm:ss", Locale.getDefault ());
   refreshScreen ();
 }
+
+// Convert a lat / long double to a formatted string
+private String locationToString (double d)
+{ return Location.convert (d, Location.FORMAT_DEGREES); }
+
+// Convert a UTC long time to a string using default Locale
+private String timeToString (long t)
+{ return timeFormatter.format (new Date (t)); }
 
 private void handleLastLocationFailed ()
 { btnCurrentLocation.setEnabled (true); }
@@ -105,7 +130,15 @@ private void handleLastLocationFailed ()
 private void handleLastLocationFound (Location location)
 {
   Log.v (Constants.LOGTAG, CLASSTAG + "Last location found: " + location);
-  positionLabels.setVisibility (VISIBLE);
+
+  // Display the location
+  titlePosition.setText (R.string.title_last_location);
+  latitude.setText (locationToString (location.getLatitude ()));
+  longitude.setText (locationToString (location.getLongitude ()));
+  locationTime.setText (timeToString (location.getTime ()));
+  framePosition.setVisibility (VISIBLE);
+
+  // Enable the get location button
   btnCurrentLocation.setEnabled (true);
 }
 
@@ -139,7 +172,7 @@ private void handleLocationAvailable (LocationAvailability availability)
   {
     Log.i ( Constants.LOGTAG,
         CLASSTAG + "LocationAvailabilty.isLocationAvailable returns false" );
-    btnCurrentLocation.setEnabled (true);
+    handleLocationNotAvailable ();
   }
 }
 
@@ -172,7 +205,7 @@ private void refreshScreen ()
   // We also make the position labels invisible. It will be made visible if a
   // location is obtained.
   btnCurrentLocation.setEnabled (false);
-  positionLabels.setVisibility (INVISIBLE);
+  framePosition.setVisibility (INVISIBLE);
   app.getLocationAvailability ()
       .addOnSuccessListener ( new OnSuccessListener<LocationAvailability> ()
       {
