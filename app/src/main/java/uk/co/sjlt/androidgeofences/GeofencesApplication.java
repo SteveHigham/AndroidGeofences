@@ -279,7 +279,7 @@ private void handleAddingFenceSucceeded ()
   dialogActivity = null;
 
   // Transition to the Display Location screen
-  startActivity (new Intent (activity, DisplayLocationActivity.class));
+  activity.startActivity (new Intent (activity, DisplayLocationActivity.class));
 }
 
 /**
