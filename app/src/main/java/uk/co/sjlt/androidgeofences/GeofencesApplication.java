@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 import static com.google.android.gms.location.GeofencingRequest.*;
 
@@ -167,8 +168,10 @@ public void initGeofencing (Activity activity)
     pendingIntent =
         PendingIntent.getBroadcast (this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT );
-    addFences (activity);
   }
+
+  // We don't mind adding the same fences multiple times and we need to keep the flow going.
+  addFences (activity);
 }
 
 public void addFences (Activity activity)
@@ -279,7 +282,13 @@ private void handleAddingFenceSucceeded ()
   dialogActivity = null;
 
   // Transition to the Display Location screen
-  activity.startActivity (new Intent (activity, DisplayLocationActivity.class));
+  // We see a crash under Android 10 if we don't set the FLAG_ACTIVITY_NEW_TASK
+  Intent intent = new Intent (activity, DisplayLocationActivity.class);
+  intent.addFlags (FLAG_ACTIVITY_NEW_TASK);
+  activity.startActivity (intent);
+
+  // Now we can kill the Request Permissions Activity
+  activity.finish ();
 }
 
 /**
