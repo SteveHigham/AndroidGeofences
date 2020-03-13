@@ -146,6 +146,24 @@ public @NotNull String getStatusText ()
   return result;
 }
 
+public String getTransitionString (Resources resources, int transition)
+{
+  String result;
+  switch (transition)
+  {
+    case Geofence.GEOFENCE_TRANSITION_ENTER:
+      result = resources.getString (R.string.geofence_event_enter);
+      break;
+    case Geofence.GEOFENCE_TRANSITION_EXIT:
+      result = resources.getString (R.string.geofence_event_exit);
+      break;
+    default:
+      result = resources.getString (R.string.geofence_event_unknown);
+
+  }
+  return result;
+}
+
 public boolean isDialogActive () { return dialogActivity != null; }
 
 public boolean isGeofencingInitialised () { return geofencingClient != null; }

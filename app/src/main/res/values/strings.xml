@@ -9,6 +9,9 @@
     <string name="failed_with_unexpected_error">
         Failed with unexpected error: %1$s
     </string>
+    <string name="geofence_event_enter">ENTER</string>
+    <string name="geofence_event_exit">EXIT</string>
+    <string name="geofence_event_unknown">UNKNOWN</string>
     <string name="geofence_insufficient_location_permission">
         The app has insufficient permissions for geofencing
     </string>
@@ -56,9 +59,6 @@
 
     <!-- Broadcast Receiver -->
     <string name="receiver_log_transition">%1$s event on Fence: %2$s</string>
-    <string name="receiver_enter_transition">ENTER</string>
-    <string name="receiver_exit_transition">EXIT</string>
-    <string name="receiver_unknown_transition">UNKNOWN</string>
     <string name="title_activity_test">Test Activity</string>
 
 </resources>

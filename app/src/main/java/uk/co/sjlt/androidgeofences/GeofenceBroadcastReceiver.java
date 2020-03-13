@@ -43,30 +43,14 @@ public void onReceive (Context context, Intent intent)
   }
 }
 
-private String getTransitionString (Resources resources, int transition)
-{
-  String result;
-  switch (transition)
-  {
-    case Geofence.GEOFENCE_TRANSITION_ENTER:
-      result = resources.getString (R.string.receiver_enter_transition);
-      break;
-    case Geofence.GEOFENCE_TRANSITION_EXIT:
-      result = resources.getString (R.string.receiver_exit_transition);
-      break;
-    default:
-      result = resources.getString (R.string.receiver_unknown_transition);
-
-  }
-  return result;
-}
-
 private void handleTransition (Context context, String fence, int transition)
 {
   // Log the event
+  GeofencesApplication app =
+      (GeofencesApplication) (context.getApplicationContext ());
   Resources resources = context.getResources ();
   String msg = resources.getString ( R.string.receiver_log_transition,
-      getTransitionString (resources, transition), fence );
+      app.getTransitionString (resources, transition), fence );
   Log.i (Constants.LOGTAG, CLASSTAG + msg);
 }
 
