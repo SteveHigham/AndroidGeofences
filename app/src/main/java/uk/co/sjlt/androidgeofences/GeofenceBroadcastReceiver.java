@@ -10,6 +10,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 
+import java.util.Date;
 import java.util.List;
 
 public class GeofenceBroadcastReceiver extends BroadcastReceiver
@@ -52,6 +53,9 @@ private void handleTransition (Context context, String fence, int transition)
   String msg = resources.getString ( R.string.receiver_log_transition,
       app.getTransitionString (resources, transition), fence );
   Log.i (Constants.LOGTAG, CLASSTAG + msg);
+
+  // Add to the event list
+  app.getEvents ().add (new FenceEvent (new Date (), fence, transition));
 }
 
 }

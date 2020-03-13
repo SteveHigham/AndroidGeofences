@@ -25,6 +25,8 @@ import com.google.android.gms.tasks.Task;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -57,6 +59,16 @@ public enum Status { DEFAULT, FENCES_ADDED, FENCES_FAILED, FENCES_REMOVED }
 
 private FusedLocationProviderClient fusedLocationClient;
 private GeofencingClient geofencingClient;
+
+/**
+ * I store events in this array as additions will come in from the
+ * BroadCastReceiver but requests will come in from the Activities. Therefore
+ * I want to use a threadsave solution.
+ * Updates are rare (not many per second) so I'm not worried about the arrays
+ * performance.
+ */
+@Getter
+CopyOnWriteArrayList<FenceEvent> events;
 
 /**
  * Identifies whether we have the background location permission.
@@ -113,6 +125,7 @@ public void onCreate ()
   super.onCreate ();
   Log.v (Constants.LOGTAG, CLASSTAG + "Application onCreate called");
   status = Status.DEFAULT;
+  events = new CopyOnWriteArrayList<> ();
 }
 
 public Task<Location> getLastLocation ()
@@ -138,6 +151,7 @@ public @NotNull String getStatusText ()
       break;
     case FENCES_REMOVED:
       resId = R.string.status_fences_removed;
+      break;
     default:
       resId = R.string.status_unknown;
   }
