@@ -3,9 +3,7 @@
     package="uk.co.sjlt.androidgeofences">
 
     <uses-permission android:name="android.permission.ACCESS_COURSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- Required if your app targets Android 10 (API level 29) or higher -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Required if your app targets Android 10 (API level 29) or higher -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
@@ -16,7 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity
+            android:name=".FenceEventsActivity"
+            android:label="@string/title_activity_fence_events"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".RequestPermissionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,7 +27,7 @@
         </activity>
         <activity android:name=".DisplayLocationActivity" />
 
-        <receiver android:name=".GeofenceBroadcastReceiver"/>
+        <receiver android:name=".GeofenceBroadcastReceiver" />
     </application>
 
 </manifest>

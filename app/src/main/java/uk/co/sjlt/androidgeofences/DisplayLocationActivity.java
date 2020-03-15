@@ -1,11 +1,14 @@
 package uk.co.sjlt.androidgeofences;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -16,7 +19,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,7 +41,8 @@ private TextView coarsePermission;
 private TextView finePermission;
 private TextView backgroundPermission;
 
-private Button btnCurrentLocation;
+private Button btnShowEvents;
+private Button btnDisplayLocation;
 
 private ConstraintLayout framePosition;
 
@@ -53,6 +56,7 @@ private SimpleDateFormat timeFormatter;
 protected void onCreate (Bundle savedInstanceState)
 {
   super.onCreate (savedInstanceState);
+  Log.v (Constants.LOGTAG, CLASSTAG + "onCreate called");
   setContentView (R.layout.activity_display_location);
 
   status                = findViewById (R.id.status_value);
@@ -60,13 +64,27 @@ protected void onCreate (Bundle savedInstanceState)
   finePermission        = findViewById (R.id.fine_permission_value);
   backgroundPermission  = findViewById (R.id.background_permission_value);
 
-  btnCurrentLocation = findViewById (R.id.btnCurrentLocation);
+  btnShowEvents       = findViewById (R.id.button_show_events);
+  btnDisplayLocation  = findViewById (R.id.button_display_location);
 
   framePosition   = findViewById (R.id.frame_position);
   titlePosition   = findViewById (R.id.title_position);
   latitude        = findViewById (R.id.latitude_value);
   longitude       = findViewById (R.id.longitude_value);
   locationTime    = findViewById (R.id.time_value);
+
+  // I assume the app is running and permissions have already been granted.
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+  btnShowEvents.setEnabled (app.isHasBackgroundLocationPermission ());
+  if (btnShowEvents.isEnabled ())
+  {
+    btnShowEvents.setOnClickListener (new View.OnClickListener ()
+    {
+      @Override
+      public void onClick (View view)
+      { handleShowEvents (); }
+    });
+  }
 }
 
 @Override
@@ -75,6 +93,19 @@ public boolean onCreateOptionsMenu (Menu menu)
   MenuInflater inflater = getMenuInflater ();
   inflater.inflate (R.menu.display_location_menu, menu);
   return true;
+}
+
+@Override
+public boolean onOptionsItemSelected (MenuItem item)
+{
+  switch (item.getItemId ())
+  {
+    case R.id.menu_show_events:
+      handleShowEvents ();
+      return true;
+    default:
+      return super.onOptionsItemSelected (item);
+  }
 }
 
 /**
@@ -116,16 +147,20 @@ public void onResume ()
   refreshScreen ();
 }
 
-// Convert a lat / long double to a formatted string
+/**
+ * Convert a lat / long double to a formatted string
+ */
 private String locationToString (double d)
 { return Location.convert (d, Location.FORMAT_DEGREES); }
 
-// Convert a UTC long time to a string using default Locale
+/**
+ * Convert a UTC long time to a string using default Locale
+ */
 private String timeToString (long t)
 { return timeFormatter.format (new Date (t)); }
 
 private void handleLastLocationFailed ()
-{ btnCurrentLocation.setEnabled (true); }
+{ btnDisplayLocation.setEnabled (true); }
 
 private void handleLastLocationFound (Location location)
 {
@@ -139,7 +174,7 @@ private void handleLastLocationFound (Location location)
   framePosition.setVisibility (VISIBLE);
 
   // Enable the get location button
-  btnCurrentLocation.setEnabled (true);
+  btnDisplayLocation.setEnabled (true);
 }
 
 private void handleLocationAvailable (LocationAvailability availability)
@@ -179,7 +214,13 @@ private void handleLocationAvailable (LocationAvailability availability)
 private void handleLocationNotAvailable ()
 {
   Log.i (Constants.LOGTAG, CLASSTAG + "Last known location not available");
-  btnCurrentLocation.setEnabled (true);
+  btnDisplayLocation.setEnabled (true);
+}
+
+private void handleShowEvents ()
+{
+  Intent intent = new Intent (this, FenceEventsActivity.class);
+  startActivity (intent);
 }
 
 private void refreshScreen ()
@@ -204,7 +245,7 @@ private void refreshScreen ()
   // location.
   // We also make the position labels invisible. It will be made visible if a
   // location is obtained.
-  btnCurrentLocation.setEnabled (false);
+  btnDisplayLocation.setEnabled (false);
   framePosition.setVisibility (INVISIBLE);
   app.getLocationAvailability ()
       .addOnSuccessListener ( new OnSuccessListener<LocationAvailability> ()
