@@ -1,6 +1,7 @@
 package uk.co.sjlt.androidgeofences;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,12 +9,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FenceEventsActivity extends AppCompatActivity
 {
 
-  Iterator<FenceEvent> eventIterator;
+private static final String CLASSTAG =
+    " " + FenceEventsActivity.class.getSimpleName () + " ";
+
+List<FenceEvent> events;
 
 @Override
 protected void onCreate (Bundle savedInstanceState)
@@ -24,8 +29,14 @@ protected void onCreate (Bundle savedInstanceState)
 
   setSupportActionBar (toolbar);
   ActionBar actionBar = getSupportActionBar ();
-  actionBar.setDisplayHomeAsUpEnabled (true);
-  actionBar.setDisplayShowHomeEnabled (true);
+  if (actionBar == null)
+  {
+    Log.w (Constants.LOGTAG, CLASSTAG + "Connot access the action bar");
+  } else
+  {
+    actionBar.setDisplayHomeAsUpEnabled (true);
+    actionBar.setDisplayShowHomeEnabled (true);
+  }
 
   RecyclerView recycler = findViewById (R.id.fence_events_recycler);
   LinearLayoutManager layoutMgr = new LinearLayoutManager (this);
@@ -36,20 +47,29 @@ protected void onCreate (Bundle savedInstanceState)
 public void onPause ()
 {
   super.onPause ();
-  eventIterator = null;
+  events = null;
 }
 
 @Override
 public void onResume ()
 {
   super.onResume ();
-  updateIterator ();
+  events = new ArrayList<> ();
+  updateEvents ();
 }
 
-private void updateIterator ()
+private void updateEvents ()
 {
   GeofencesApplication app = (GeofencesApplication) getApplication ();
-  eventIterator = app.getEvents ().iterator ();
+  List<FenceEvent> appEvents = app.getEvents ();
+  int numEvents = appEvents.size ();
+  int eventsSize = events.size ();
+  if (numEvents > eventsSize)
+  {
+    events.addAll (eventsSize, appEvents);
+  }
+  if ((events.size () != numEvents))
+  { throw new AssertionError ("Event adding failed"); }
 }
 
 }
