@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Message;
 import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
@@ -22,13 +23,15 @@ private static final String CLASSTAG =
 @Override
 public void onReceive (Context context, Intent intent)
 {
+  Log.v ( Constants.LOGTAG,
+      CLASSTAG + "Event received from intent with action: " + intent.getAction ());
   GeofencingEvent event = GeofencingEvent.fromIntent (intent);
 
   if (event.hasError ())
   {
     String msg =
         GeofenceStatusCodes.getStatusCodeString (event.getErrorCode ());
-    Log.e (Constants.LOGTAG, CLASSTAG + "Error: " + msg);
+    Log.w (Constants.LOGTAG, CLASSTAG + "Error: " + msg);
   } else
   {
     int transition = event.getGeofenceTransition ();
@@ -42,7 +45,12 @@ public void onReceive (Context context, Intent intent)
       }
     }
   }
-}
+
+  // Now send on...
+  Log.v ( Constants.LOGTAG, CLASSTAG + "Event context class: " +
+      context.getClass ().getCanonicalName () );
+  DisplayLocationActivity.getHandler ().handleMessage (new Message ());
+ }
 
 private void handleTransition (Context context, String fence, int transition)
 {

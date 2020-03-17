@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -79,7 +80,7 @@ protected void onCreate (Bundle savedInstanceState)
   } else
   {
     // No permissions required.
-    initialiseGeofencing ();
+    startActivity (new Intent (this, DisplayLocationActivity.class));
   }
 }
 
@@ -94,9 +95,7 @@ public void onRequestPermissionsResult ( int requestCode,
   // Ignore any calls which are not related to REQUEST_CODE_PERMISSIONS
   if (requestCode == REQUEST_CODE_PERMISSIONS)
   {
-    //Context context = getApplicationContext ();
     GeofencesApplication app = (GeofencesApplication) getApplication ();
-    //boolean foreground = app.isHasForegroundLocationPermission ();
     boolean coarsePermission = app.isHasCoarseLocationPermission ();
     boolean finePermission = app.isHasFineLocationPermission ();
     boolean backgroundPermission = app.isHasBackgroundLocationPermission ();
@@ -135,8 +134,8 @@ public void onRequestPermissionsResult ( int requestCode,
       {
         handleForegroundLocationUpdatesOnly (coarsePermission, finePermission);
       }
-      // We have some / all permisissions so we can initialise the geofencing
-      initialiseGeofencing ();
+      // We have some / all permisissions so we can progress to the next screen
+      startActivity (new Intent (this, DisplayLocationActivity.class));
     } else
     {
       createInadequatePermissionsDialog ();
@@ -189,12 +188,6 @@ private void handleForegroundLocationUpdatesOnly ( boolean coarsePermission,
   GeofencesApplication app = (GeofencesApplication) getApplication ();
   app.setHasCoarseLocationPermission (coarsePermission);
   app.setHasFineLocationPermission (finePermission);
-}
-
-private void initialiseGeofencing ()
-{
-  GeofencesApplication app = (GeofencesApplication) getApplication ();
-  app.initGeofencing (this);
 }
 
 /**

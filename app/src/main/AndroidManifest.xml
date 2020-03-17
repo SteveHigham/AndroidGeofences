@@ -18,12 +18,14 @@
         <activity android:name=".RequestPermissionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".DisplayLocationActivity" />
+        <!-- launchMode="singleTask" required for static Handler -->
+        <activity
+            android:name=".DisplayLocationActivity"
+            android:launchMode="singleTask"/>
 
         <activity
             android:name=".FenceEventsActivity"

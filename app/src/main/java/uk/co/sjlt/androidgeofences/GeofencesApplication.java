@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
+import android.os.Message;
 import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
@@ -30,7 +31,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 import static com.google.android.gms.location.GeofencingRequest.*;
 
@@ -63,7 +63,7 @@ private GeofencingClient geofencingClient;
 /**
  * I store events in this array as additions will come in from the
  * BroadCastReceiver but requests will come in from the Activities. Therefore
- * I want to use a threadsave solution.
+ * I want to use a threadsafe solution.
  * Updates are rare (not many per second) so I'm not worried about the arrays
  * performance.
  */
@@ -178,32 +178,36 @@ public String getTransitionString (Resources resources, int transition)
   return result;
 }
 
-public boolean isDialogActive () { return dialogActivity != null; }
-
 public boolean isGeofencingInitialised () { return geofencingClient != null; }
 
 /**
  * This initialises the Geofencing system.
  * This cannot be done until the relevant permissions have been verified,
- * therefore this is called from the RequestPermissionsActivity.
+ * therefore this is called from the DisplayLocationActivity.
  */
 public void initGeofencing (Activity activity)
 {
-  if (! isGeofencingInitialised ())
+  // Initialise the fused location client if needed.
+  if (fusedLocationClient == null)
   {
-    // Initialise the Fused Location Client
     fusedLocationClient = LocationServices.getFusedLocationProviderClient (this);
-
-    // Initialise the geofencing
-    geofencingClient = LocationServices.getGeofencingClient (this);
-    Intent intent = new Intent (this, GeofenceBroadcastReceiver.class);
-    pendingIntent =
-        PendingIntent.getBroadcast (this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT );
   }
 
-  // We don't mind adding the same fences multiple times and we need to keep the flow going.
-  addFences (activity);
+  if (isHasBackgroundLocationPermission ())
+  {
+    if (! isGeofencingInitialised ())
+    {
+      // Initialise the geofencing
+      geofencingClient = LocationServices.getGeofencingClient (this);
+      Intent intent = new Intent (activity, GeofenceBroadcastReceiver.class);
+      pendingIntent =
+          PendingIntent.getBroadcast (this, 0, intent,
+              PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+    // We don't mind adding the same fences multiple times and we need to keep the flow going.
+    addFences (activity);
+  }
 }
 
 public void addFences (Activity activity)
@@ -310,17 +314,8 @@ private void handleAddingFenceSucceeded ()
 {
   Log.i (Constants.LOGTAG, CLASSTAG + "Fence added.");
   status = Status.FENCES_ADDED;
-  Activity activity = dialogActivity;
-  dialogActivity = null;
-
-  // Transition to the Display Location screen
-  // We see a crash under Android 10 if we don't set the FLAG_ACTIVITY_NEW_TASK
-  Intent intent = new Intent (activity, DisplayLocationActivity.class);
-  intent.addFlags (FLAG_ACTIVITY_NEW_TASK);
-  activity.startActivity (intent);
-
-  // Now we can kill the Request Permissions Activity
-  activity.finish ();
+  // Force a screen refresh on DisplayLocationActivity
+  DisplayLocationActivity.getHandler ().handleMessage (new Message ());
 }
 
 /**
@@ -335,9 +330,8 @@ private void handleCloseAddingFenceFailedDialog ()
   Activity activity = dialogActivity;
   dialogActivity = null;
   status = Status.FENCES_FAILED;
-
-  // Transition to the Display Location screen
-  startActivity (new Intent (activity, DisplayLocationActivity.class));
+  // Force a screen refresh on DisplayLocationActivity
+  DisplayLocationActivity.getHandler ().handleMessage (new Message ());
 }
 
 }

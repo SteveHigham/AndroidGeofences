@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,9 +22,13 @@ import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import lombok.Getter;
 
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
@@ -30,9 +36,17 @@ import static android.view.View.VISIBLE;
 
 /**
  * This screen will display the current location on request.
+ * I make this activity a singleton so that GeofenceBroadcastReceiver can
+ * access the public Handler. This is horrible but I can't fine a neat
+ * solution.
+ * This requires the manifest to set the launchMode="singleTask" attribute for
+ * this class.
  */
 public class DisplayLocationActivity extends AppCompatActivity
 {
+
+@Getter
+private static Handler handler;
 
 private static final String CLASSTAG =
     " " + DisplayLocationActivity.class.getSimpleName () + " ";
@@ -85,6 +99,28 @@ protected void onCreate (Bundle savedInstanceState)
   latitude        = findViewById (R.id.latitude_value);
   longitude       = findViewById (R.id.longitude_value);
   locationTime    = findViewById (R.id.time_value);
+
+  if (handler == null)
+  {
+    handler = new Handler (getMainLooper ())
+    {
+      @Override
+      public void handleMessage (@NotNull Message msg)
+      {
+        Log.v (Constants.LOGTAG, CLASSTAG + "Handler receives Event");
+        refreshScreen ();
+      }
+    };
+  } else
+  {
+    Log.e ( Constants.LOGTAG,
+        CLASSTAG + "Multiple DisplayLocationActivity instances");
+    // This should not occur if the manifest has the
+    // android:launchMode="singleTask" attribute
+  }
+
+  // Now this is set up we can initialise Geofencing
+  initialiseGeofencing ();
 
   // I assume the app is running and permissions have already been granted.
   GeofencesApplication app = (GeofencesApplication) getApplication ();
@@ -140,6 +176,14 @@ public void onPause ()
   }
 }
 
+@Override
+public boolean onPrepareOptionsMenu (Menu menu)
+{
+  Log.v (Constants.LOGTAG, CLASSTAG + "onPrepareOptionsMenu called");
+  menu.findItem (R.id.menu_show_events).setEnabled (getNumEvents () > 0);
+  return true;
+}
+
 /**
  * We need to cater for the use case where the add fences initially fails. The user
  * then fixes the problem (device not allowing fine location) and returns to
@@ -150,16 +194,87 @@ public void onResume ()
 {
   super.onResume ();
   Log.v (Constants.LOGTAG, CLASSTAG + "onResume called");
+
+  // Add fences if required
   GeofencesApplication app = (GeofencesApplication) getApplication ();
   if ( app.isGeofencingInitialised () &&
       (app.getStatus () == GeofencesApplication.Status.DEFAULT) )
   {
     app.addFences (this);
   }
+
   // Replace the time formatter in case the Locale has changed.
   timeFormatter =
       new SimpleDateFormat ("dd-MMM HH:mm:ss", Locale.getDefault ());
   refreshScreen ();
+}
+
+public void refreshScreen ()
+{
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+
+  // Display known statuses
+  status.setText (app.getStatusText ());
+  Resources res = getResources ();
+  String text = res.getString ( app.isHasCoarseLocationPermission () ?
+      R.string.permission_granted : R.string.permission_withheld );
+  coarsePermission.setText (text);
+  text = res.getString ( app.isHasFineLocationPermission () ?
+      R.string.permission_granted : R.string.permission_withheld );
+  finePermission.setText (text);
+  text = res.getString ( app.isHasBackgroundLocationPermission () ?
+      R.string.permission_granted : R.string.permission_withheld );
+  backgroundPermission.setText (text);
+
+  // We only show the number of events received if we have the background permission
+  if (app.isHasBackgroundLocationPermission ())
+  {
+    numEventsLabel.setEnabled (true);
+    numEventsLabel.setVisibility (VISIBLE);
+    numEvents.setEnabled (true);
+    Locale locale = Locale.getDefault ();
+    numEvents.setText (String.format (locale, "%d", getNumEvents ()));
+    numEvents.setVisibility (VISIBLE);
+  } else
+  {
+    numEventsLabel.setEnabled (false);
+    numEventsLabel.setVisibility (GONE);
+    numEvents.setEnabled (false);
+    numEvents.setVisibility (GONE);
+  }
+
+  btnShowEvents.setEnabled (getNumEvents () > 0);
+
+  // Check the availability of the current location
+  // We disable the Get Location button whilst we are querying the last known
+  // location.
+  // We also make the position labels invisible. It will be made visible if a
+  // location is obtained.
+  btnDisplayLocation.setEnabled (false);
+  framePosition.setVisibility (INVISIBLE);
+  app.getLocationAvailability ()
+      .addOnSuccessListener ( new OnSuccessListener<LocationAvailability> ()
+      {
+        @Override
+        public void onSuccess (LocationAvailability availability)
+        {
+          handleLocationAvailable (availability);
+        }
+      } )
+      .addOnFailureListener ( new OnFailureListener ()
+      {
+        @Override
+        public void onFailure (@NonNull Exception e)
+        {
+          Log.w ( Constants.LOGTAG,
+              CLASSTAG + "Location availability failure: " +
+                  e.getLocalizedMessage () );
+          handleLocationNotAvailable ();
+        }
+      } );
+
+  // Force the menu to be updated
+  invalidateOptionsMenu ();
 }
 
 /**
@@ -238,67 +353,10 @@ private void handleShowEvents ()
   startActivity (intent);
 }
 
-private void refreshScreen ()
+private void initialiseGeofencing ()
 {
   GeofencesApplication app = (GeofencesApplication) getApplication ();
-
-  // Display known statuses
-  status.setText (app.getStatusText ());
-  Resources res = getResources ();
-  String text = res.getString ( app.isHasCoarseLocationPermission () ?
-      R.string.permission_granted : R.string.permission_withheld );
-  coarsePermission.setText (text);
-  text = res.getString ( app.isHasFineLocationPermission () ?
-      R.string.permission_granted : R.string.permission_withheld );
-  finePermission.setText (text);
-  text = res.getString ( app.isHasBackgroundLocationPermission () ?
-      R.string.permission_granted : R.string.permission_withheld );
-  backgroundPermission.setText (text);
-
-  // We only show the number of events received if we have the background permission
-  if (app.isHasBackgroundLocationPermission ())
-  {
-    numEventsLabel.setEnabled (true);
-    numEventsLabel.setVisibility (VISIBLE);
-    numEvents.setEnabled (true);
-    Locale locale = Locale.getDefault ();
-    numEvents.setText (String.format (locale, "%d", getNumEvents ()));
-    numEvents.setVisibility (VISIBLE);
-  } else
-  {
-    numEventsLabel.setEnabled (false);
-    numEventsLabel.setVisibility (GONE);
-    numEvents.setEnabled (false);
-    numEvents.setVisibility (GONE);
-  }
-
-  // Check the availability of the current location
-  // We disable the Get Location button whilst we are querying the last known
-  // location.
-  // We also make the position labels invisible. It will be made visible if a
-  // location is obtained.
-  btnDisplayLocation.setEnabled (false);
-  framePosition.setVisibility (INVISIBLE);
-  app.getLocationAvailability ()
-      .addOnSuccessListener ( new OnSuccessListener<LocationAvailability> ()
-      {
-        @Override
-        public void onSuccess (LocationAvailability availability)
-        {
-          handleLocationAvailable (availability);
-        }
-      } )
-      .addOnFailureListener ( new OnFailureListener ()
-      {
-        @Override
-        public void onFailure (@NonNull Exception e)
-        {
-          Log.w ( Constants.LOGTAG,
-              CLASSTAG + "Location availability failure: " +
-                  e.getLocalizedMessage () );
-          handleLocationNotAvailable ();
-        }
-      } );
+  app.initGeofencing (this);
 }
 
 }
