@@ -111,14 +111,16 @@ public boolean onCreateOptionsMenu (Menu menu)
 @Override
 public boolean onOptionsItemSelected (MenuItem item)
 {
-  switch (item.getItemId ())
+  boolean result;
+  if (item.getItemId () == R.id.menu_show_events)
   {
-    case R.id.menu_show_events:
-      handleShowEvents ();
-      return true;
-    default:
-      return super.onOptionsItemSelected (item);
+    handleShowEvents ();
+    result = true;
+  } else
+  {
+    result = super.onOptionsItemSelected (item);
   }
+  return result;
 }
 
 /**
@@ -259,7 +261,8 @@ private void refreshScreen ()
     numEventsLabel.setEnabled (true);
     numEventsLabel.setVisibility (VISIBLE);
     numEvents.setEnabled (true);
-    numEvents.setText (Integer.toString (getNumEvents ()));
+    Locale locale = Locale.getDefault ();
+    numEvents.setText (String.format (locale, "%d", getNumEvents ()));
     numEvents.setVisibility (VISIBLE);
   } else
   {
