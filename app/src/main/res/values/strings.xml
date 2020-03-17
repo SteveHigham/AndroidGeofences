@@ -57,6 +57,7 @@
     <string name="coarse_permission_label">Coarse location access</string>
     <string name="fine_permission_label">Fine location access</string>
     <string name="background_permission_label">Background loc. access</string>
+    <string name="num_events_label">Background events</string>
     <string name="permission_granted">Granted</string>
     <string name="permission_withheld">Withheld</string>
 

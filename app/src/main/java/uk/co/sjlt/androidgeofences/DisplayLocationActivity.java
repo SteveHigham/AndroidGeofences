@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -36,10 +37,13 @@ public class DisplayLocationActivity extends AppCompatActivity
 private static final String CLASSTAG =
     " " + DisplayLocationActivity.class.getSimpleName () + " ";
 
+private TextView numEventsLabel;
+
 private TextView status;
 private TextView coarsePermission;
 private TextView finePermission;
 private TextView backgroundPermission;
+private TextView numEvents;
 
 private Button btnShowEvents;
 private Button btnDisplayLocation;
@@ -52,6 +56,12 @@ private TextView longitude;
 private TextView locationTime;
 private SimpleDateFormat timeFormatter;
 
+private int getNumEvents ()
+{
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+  return app.getEvents ().size ();
+}
+
 @Override
 protected void onCreate (Bundle savedInstanceState)
 {
@@ -59,10 +69,13 @@ protected void onCreate (Bundle savedInstanceState)
   Log.v (Constants.LOGTAG, CLASSTAG + "onCreate called");
   setContentView (R.layout.activity_display_location);
 
+  numEventsLabel = findViewById (R.id.num_events_label);
+
   status                = findViewById (R.id.status_value);
   coarsePermission      = findViewById (R.id.coarse_permission_value);
   finePermission        = findViewById (R.id.fine_permission_value);
   backgroundPermission  = findViewById (R.id.background_permission_value);
+  numEvents             = findViewById (R.id.num_events_value);
 
   btnShowEvents       = findViewById (R.id.button_show_events);
   btnDisplayLocation  = findViewById (R.id.button_display_location);
@@ -239,6 +252,22 @@ private void refreshScreen ()
   text = res.getString ( app.isHasBackgroundLocationPermission () ?
       R.string.permission_granted : R.string.permission_withheld );
   backgroundPermission.setText (text);
+
+  // We only show the number of events received if we have the background permission
+  if (app.isHasBackgroundLocationPermission ())
+  {
+    numEventsLabel.setEnabled (true);
+    numEventsLabel.setVisibility (VISIBLE);
+    numEvents.setEnabled (true);
+    numEvents.setText (Integer.toString (getNumEvents ()));
+    numEvents.setVisibility (VISIBLE);
+  } else
+  {
+    numEventsLabel.setEnabled (false);
+    numEventsLabel.setVisibility (GONE);
+    numEvents.setEnabled (false);
+    numEvents.setVisibility (GONE);
+  }
 
   // Check the availability of the current location
   // We disable the Get Location button whilst we are querying the last known
