@@ -26,6 +26,12 @@ FenceEvent (@NonNull Date t, @NonNull String f, int i)
   event = i;
 }
 
+public @NonNull String toString ()
+{
+  return "{Time: " + timestamp + ", Fence: " + fence + ", Event: " + event +
+      "}";
+}
+
 }
 
 // End of class.

@@ -23,6 +23,10 @@ private static final String CLASSTAG =
 
 static class EventViewHolder extends RecyclerView.ViewHolder
 {
+  private static final String CLASSTAG =
+      " " + FenceEventsAdapter.class.getSimpleName () + "." +
+      EventViewHolder.class.getSimpleName () + " ";
+
   TextView eventTimeView;
   TextView eventFenceView;
   TextView eventTypeView;
@@ -30,6 +34,7 @@ static class EventViewHolder extends RecyclerView.ViewHolder
   EventViewHolder (View view)
   {
     super (view);
+    Log.v (Constants.LOGTAG, CLASSTAG + "Constructor called");
     eventTimeView   = view.findViewById (R.id.event_time);
     eventFenceView  = view.findViewById (R.id.event_fence);
     eventTypeView   = view.findViewById (R.id.event_type);
@@ -63,6 +68,8 @@ FenceEventsAdapter (@NotNull GeofencesApplication theApp)
 {
   app = theApp;
   events = app.getEvents ();
+  timeFormatter =
+      new SimpleDateFormat ("dd-MMM HH:mm", Locale.getDefault ());
 }
 
 @Override
@@ -77,6 +84,7 @@ public void onBindViewHolder (@NonNull EventViewHolder holder, int i)
 {
   Log.v (Constants.LOGTAG, CLASSTAG + "onBindViewHolder called");
   FenceEvent event = events.get (i);
+  Log.v (Constants.LOGTAG, CLASSTAG + "Binding event: " + event);
   String text = timeFormatter.format (event.getTimestamp ());
   holder.eventTimeView.setText (text);
   holder.eventFenceView.setText (event.getFence ());
