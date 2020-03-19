@@ -59,7 +59,24 @@ public void onResume ()
   GeofencesApplication app = (GeofencesApplication) getApplication ();
   FenceEventsAdapter adapter = new FenceEventsAdapter (app);
   recycler.setAdapter (adapter);
+  recycler.invalidate ();
 }
+
+@Override
+public void onStart ()
+{
+  super.onStart ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onStart called");
+}
+
+@Override
+public void onStop ()
+{
+  super.onStop ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onPause called");
+}
+
+
 
 }
 
