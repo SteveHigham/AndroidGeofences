@@ -2,6 +2,7 @@ package uk.co.sjlt.androidgeofences;
 
 import java.util.Date;
 
+import androidx.annotation.NonNull;
 import lombok.Getter;
 
 /**
@@ -10,15 +11,15 @@ import lombok.Getter;
 class FenceEvent
 {
 @Getter
-private Date timestamp;
+private final @NonNull Date timestamp;
 
 @Getter
-private String fence;
+private final @NonNull String fence;
 
 @Getter
-int event;
+private final int event;
 
-FenceEvent (Date t, String f, int i)
+FenceEvent (@NonNull Date t, @NonNull String f, int i)
 {
   timestamp = t;
   fence = f;

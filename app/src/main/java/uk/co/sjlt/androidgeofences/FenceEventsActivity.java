@@ -18,12 +18,13 @@ public class FenceEventsActivity extends AppCompatActivity
 private static final String CLASSTAG =
     " " + FenceEventsActivity.class.getSimpleName () + " ";
 
-List<FenceEvent> events;
+private RecyclerView recycler;
 
 @Override
 protected void onCreate (Bundle savedInstanceState)
 {
   super.onCreate (savedInstanceState);
+  Log.v (Constants.LOGTAG, CLASSTAG + "onCreate called");
   setContentView (R.layout.activity_fence_events);
   Toolbar toolbar = findViewById (R.id.toolbar);
 
@@ -38,7 +39,7 @@ protected void onCreate (Bundle savedInstanceState)
     actionBar.setDisplayShowHomeEnabled (true);
   }
 
-  RecyclerView recycler = findViewById (R.id.fence_events_recycler);
+  recycler = findViewById (R.id.fence_events_recycler);
   LinearLayoutManager layoutMgr = new LinearLayoutManager (this);
   recycler.setLayoutManager (layoutMgr);
 }
@@ -47,29 +48,17 @@ protected void onCreate (Bundle savedInstanceState)
 public void onPause ()
 {
   super.onPause ();
-  events = null;
+  Log.v (Constants.LOGTAG, CLASSTAG + "onPause called");
 }
 
 @Override
 public void onResume ()
 {
   super.onResume ();
-  events = new ArrayList<> ();
-  updateEvents ();
-}
-
-private void updateEvents ()
-{
+  Log.v (Constants.LOGTAG, CLASSTAG + "onResume called");
   GeofencesApplication app = (GeofencesApplication) getApplication ();
-  List<FenceEvent> appEvents = app.getEvents ();
-  int numEvents = appEvents.size ();
-  int eventsSize = events.size ();
-  if (numEvents > eventsSize)
-  {
-    events.addAll (eventsSize, appEvents);
-  }
-  if ((events.size () != numEvents))
-  { throw new AssertionError ("Event adding failed"); }
+  FenceEventsAdapter adapter = new FenceEventsAdapter (app);
+  recycler.setAdapter (adapter);
 }
 
 }
