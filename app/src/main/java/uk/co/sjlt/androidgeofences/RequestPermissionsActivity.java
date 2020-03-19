@@ -81,7 +81,15 @@ protected void onCreate (Bundle savedInstanceState)
   {
     // No permissions required.
     startActivity (new Intent (this, DisplayLocationActivity.class));
+    finish ();
   }
+}
+
+@Override
+public void onPause ()
+{
+  super.onPause ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onPause called");
 }
 
 @Override
@@ -136,12 +144,33 @@ public void onRequestPermissionsResult ( int requestCode,
       }
       // We have some / all permisissions so we can progress to the next screen
       startActivity (new Intent (this, DisplayLocationActivity.class));
+      finish ();
     } else
     {
       createInadequatePermissionsDialog ();
       inadequatePermissionsDialog.show ();
     }
   }
+}
+@Override
+public void onResume ()
+{
+  super.onResume ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onResume called");
+}
+
+@Override
+public void onStart ()
+{
+  super.onStart ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onStart called");
+}
+
+@Override
+public void onStop ()
+{
+  super.onStop ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onStop called");
 }
 
 private void createInadequatePermissionsDialog ()
