@@ -84,7 +84,7 @@ public void onBindViewHolder (@NonNull EventViewHolder holder, int i)
 {
   Log.v (Constants.LOGTAG, CLASSTAG + "onBindViewHolder called");
   FenceEvent event = events.get (i);
-  Log.v (Constants.LOGTAG, CLASSTAG + "Binding event: " + event);
+  Log.v (Constants.LOGTAG, CLASSTAG + "Binding event: " + i + " " + event);
   String text = timeFormatter.format (event.getTimestamp ());
   holder.eventTimeView.setText (text);
   holder.eventFenceView.setText (event.getFence ());

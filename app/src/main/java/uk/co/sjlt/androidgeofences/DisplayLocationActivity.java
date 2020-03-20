@@ -19,6 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -130,10 +133,16 @@ protected void onCreate (Bundle savedInstanceState)
     btnShowEvents.setOnClickListener (new View.OnClickListener ()
     {
       @Override
-      public void onClick (View view)
-      { handleShowEvents (); }
+      public void onClick (View view) { handleShowEvents (); }
     });
   }
+
+  // If we get here we must have some location permissions enabled
+  btnDisplayLocation.setOnClickListener (new View.OnClickListener ()
+  {
+    @Override
+    public void onClick (View view) { handleDisplayLocationRequest (); }
+  });
 }
 
 @Override
@@ -289,8 +298,42 @@ private String locationToString (double d)
 private String timeToString (long t)
 { return timeFormatter.format (new Date (t)); }
 
-private void handleLastLocationFailed ()
-{ btnDisplayLocation.setEnabled (true); }
+private void handleDisplayLocationRequest ()
+{
+  Log.v (Constants.LOGTAG, CLASSTAG + "Location requested");
+  GeofencesApplication app = (GeofencesApplication) getApplication ();
+  app.requestSingleLocation (new LocationCallback ()
+  {
+    @Override
+    public void onLocationAvailability (LocationAvailability la)
+    {
+      String msg = CLASSTAG +
+          "onLocationAvailability called within handleDisplayLocationRequest";
+      Log.v (Constants.LOGTAG, msg);
+    }
+
+    @Override
+    public void onLocationResult (LocationResult result)
+    { handleLocationResultReceived (result); }
+  })
+      .addOnSuccessListener ( new OnSuccessListener <Void> ()
+      {
+        @Override public void onSuccess (Void aVoid)
+        { handleLocationRequestSucceeded (); }
+      } )
+      .addOnFailureListener (new OnFailureListener ()
+      {
+        @Override public void onFailure (@NonNull Exception e)
+        { handleLocationRequestFailed (e); }
+      } );
+}
+
+private void handleLastLocationFailed (Exception e)
+{
+  Log.w ( Constants.LOGTAG,
+      CLASSTAG + "Last location failure: " + e.getLocalizedMessage () );
+  btnDisplayLocation.setEnabled (true);
+}
 
 private void handleLastLocationFound (Location location)
 {
@@ -327,10 +370,7 @@ private void handleLocationAvailable (LocationAvailability availability)
           @Override
           public void onFailure (@NonNull Exception e)
           {
-            Log.w ( Constants.LOGTAG,
-                CLASSTAG + "Last location failure: " +
-                    e.getLocalizedMessage () );
-            handleLastLocationFailed ();
+            handleLastLocationFailed (e);
           }
         } );
   } else
@@ -345,6 +385,24 @@ private void handleLocationNotAvailable ()
 {
   Log.i (Constants.LOGTAG, CLASSTAG + "Last known location not available");
   btnDisplayLocation.setEnabled (true);
+}
+
+private void handleLocationRequestFailed (Exception e)
+{
+  Log.w (Constants.LOGTAG, CLASSTAG + "Location request failure: " +
+      e.getLocalizedMessage () );
+}
+
+private void handleLocationRequestSucceeded ()
+{
+  Log.v (Constants.LOGTAG, CLASSTAG + "Location request succeeded");
+}
+
+private void handleLocationResultReceived (LocationResult result)
+{
+  String msg = CLASSTAG +
+      "onLocationAvailability called within handleDisplayLocationRequest";
+  Log.v (Constants.LOGTAG, CLASSTAG + "Location result received");
 }
 
 private void handleShowEvents ()

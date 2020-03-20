@@ -19,6 +19,8 @@ import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -111,7 +113,6 @@ private AlertDialog addingFenceFailedDialog;
  * At other times the value is null.
  */
 private Activity dialogActivity;
-
 
 private PendingIntent pendingIntent;
 
@@ -247,6 +248,16 @@ public void addFences (Activity activity)
           handleAddingFenceFailed (e);
         }
       });
+}
+
+public Task<Void> requestSingleLocation (LocationCallback callback)
+{
+  LocationRequest request = LocationRequest.create ()
+      .setNumUpdates (1)
+      .setExpirationDuration (5000)   // Give up if no location in 5 seconds
+      .setPriority (LocationRequest.PRIORITY_HIGH_ACCURACY);
+  // return fusedLocationClient.requestLocationUpdates (request, pendingIntent);
+  return fusedLocationClient.requestLocationUpdates (request, callback, getMainLooper ());
 }
 
 private void createAddingFenceFailedDialog (String msg)
