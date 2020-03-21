@@ -139,6 +139,8 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Get Current Location Button -->
+
     <Button
         android:id="@+id/button_display_location"
         android:text="@string/button_display_location"
@@ -150,10 +152,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Frame for positions -->
+    <!-- Frame for Last Location Found positions -->
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/frame_position"
+        android:id="@+id/frame_llf_position"
         android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -163,25 +165,25 @@
         app:layout_constraintLeft_toLeftOf="parent">
 
         <TextView
-            android:id="@+id/title_position"
+            android:id="@+id/title_llf_position"
+            android:text="@string/title_last_location"
             style="@style/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <!-- Frame for position labels -->
+        <!-- Frame for Last Location Found position labels -->
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/frame_position_labels"
+            android:id="@+id/frame_llf_position_labels"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@id/title_position"
+            app:layout_constraintTop_toBottomOf="@id/title_llf_position"
             app:layout_constraintLeft_toLeftOf="parent">
 
             <TextView
-                android:id="@+id/latitude_label"
+                android:id="@+id/llf_latitude_label"
                 android:text="@string/latitude_label"
                 style="@style/label"
                 android:layout_width="wrap_content"
@@ -190,40 +192,40 @@
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
-                android:id="@+id/longitude_label"
+                android:id="@+id/llf_longitude_label"
                 android:text="@string/longitude_label"
                 style="@style/label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                app:layout_constraintTop_toBottomOf="@id/latitude_label"
+                app:layout_constraintTop_toBottomOf="@id/llf_latitude_label"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
-                android:id="@+id/time_label"
+                android:id="@+id/llf_time_label"
                 android:text="@string/time_label"
                 style="@style/label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                app:layout_constraintTop_toBottomOf="@id/longitude_label"
+                app:layout_constraintTop_toBottomOf="@id/llf_longitude_label"
                 app:layout_constraintStart_toStartOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Frame for position values -->
+        <!-- Frame for Last Location Found position values -->
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/frame_position_values"
+            android:id="@+id/frame_llf_position_values"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@id/title_position"
-            app:layout_constraintStart_toEndOf="@id/frame_position_labels">
+            app:layout_constraintTop_toBottomOf="@id/title_llf_position"
+            app:layout_constraintStart_toEndOf="@id/frame_llf_position_labels">
 
             <TextView
-                android:id="@+id/latitude_value"
+                android:id="@+id/latitude_llf_value"
                 style="@style/display_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -231,26 +233,129 @@
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
-                android:id="@+id/longitude_value"
+                android:id="@+id/longitude_llf_value"
                 style="@style/display_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                app:layout_constraintTop_toBottomOf="@id/latitude_value"
+                app:layout_constraintTop_toBottomOf="@id/latitude_llf_value"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
-                android:id="@+id/time_value"
+                android:id="@+id/time_llf_value"
                 style="@style/display_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                app:layout_constraintTop_toBottomOf="@id/longitude_value"
+                app:layout_constraintTop_toBottomOf="@id/longitude_llf_value"
                 app:layout_constraintStart_toStartOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Frame for Current Position positions -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/frame_current_position"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintTop_toBottomOf="@id/frame_llf_position"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <TextView
+            android:id="@+id/title_current_position"
+            android:text="@string/title_current_position"
+            style="@style/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <!-- Frame for Last Location Found position labels -->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/frame_current_position_labels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/title_current_position"
+            app:layout_constraintLeft_toLeftOf="parent">
+
+            <TextView
+                android:id="@+id/latitude_cp_label"
+                android:text="@string/latitude_label"
+                style="@style/label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/longitude_cp_label"
+                android:text="@string/longitude_label"
+                style="@style/label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@id/latitude_cp_label"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/time_cp_label"
+                android:text="@string/time_label"
+                style="@style/label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@id/longitude_cp_label"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Frame for Last Location Found position values -->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/frame_current_position_values"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/title_current_position"
+            app:layout_constraintStart_toEndOf="@id/frame_current_position_labels">
+
+            <TextView
+                android:id="@+id/latitude_cp_value"
+                style="@style/display_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/longitude_cp_value"
+                style="@style/display_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@id/latitude_cp_value"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/time_cp_value"
+                style="@style/display_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@id/longitude_cp_value"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

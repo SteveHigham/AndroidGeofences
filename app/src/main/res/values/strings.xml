@@ -61,13 +61,14 @@
     <string name="permission_granted">Granted</string>
     <string name="permission_withheld">Withheld</string>
 
+    <string name="button_show_events">Show Fence Events</string>
     <string name="button_display_location">Get Current location</string>
 
     <string name="title_last_location">Last Location Found</string>
     <string name="latitude_label">Latitude</string>
     <string name="longitude_label">Longitude</string>
     <string name="time_label">Time</string>
-    <string name="button_show_events">Show Fence Events</string>
+    <string name="title_current_position">Current Position</string>
 
     <!-- Display Fence Events Screen -->
 

@@ -20,7 +20,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,7 +33,6 @@ import java.util.Locale;
 import lombok.Getter;
 
 import static android.view.View.GONE;
-import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 /**
@@ -65,13 +63,23 @@ private TextView numEvents;
 private Button btnShowEvents;
 private Button btnDisplayLocation;
 
-private ConstraintLayout framePosition;
+// Last Location Found
 
-private TextView titlePosition;
-private TextView latitude;
-private TextView longitude;
-private TextView locationTime;
-private SimpleDateFormat timeFormatter;
+private ConstraintLayout llfFrame;
+
+private TextView          llfLatitude;
+private TextView          llfLongitude;
+private TextView          llfTime;
+
+// Current Location
+
+private ConstraintLayout clFrame;
+
+private TextView clLatitude;
+private TextView clLongitude;
+private TextView clTime;
+
+private SimpleDateFormat  timeFormatter;
 
 private int getNumEvents ()
 {
@@ -97,11 +105,15 @@ protected void onCreate (Bundle savedInstanceState)
   btnShowEvents       = findViewById (R.id.button_show_events);
   btnDisplayLocation  = findViewById (R.id.button_display_location);
 
-  framePosition   = findViewById (R.id.frame_position);
-  titlePosition   = findViewById (R.id.title_position);
-  latitude        = findViewById (R.id.latitude_value);
-  longitude       = findViewById (R.id.longitude_value);
-  locationTime    = findViewById (R.id.time_value);
+  llfFrame      = findViewById (R.id.frame_llf_position);
+  llfLatitude   = findViewById (R.id.latitude_llf_value);
+  llfLongitude  = findViewById (R.id.longitude_llf_value);
+  llfTime       = findViewById (R.id.time_llf_value);
+
+  clFrame       = findViewById (R.id.frame_current_position);
+  clLatitude    = findViewById (R.id.latitude_cp_value);
+  clLongitude   = findViewById (R.id.longitude_cp_value);
+  clTime        = findViewById (R.id.time_cp_value);
 
   if (handler == null)
   {
@@ -260,7 +272,7 @@ public void refreshScreen ()
   // We also make the position labels invisible. It will be made visible if a
   // location is obtained.
   btnDisplayLocation.setEnabled (false);
-  framePosition.setVisibility (INVISIBLE);
+  llfFrame.setVisibility (GONE);
   app.getLocationAvailability ()
       .addOnSuccessListener ( new OnSuccessListener<LocationAvailability> ()
       {
@@ -340,11 +352,18 @@ private void handleLastLocationFound (Location location)
   Log.v (Constants.LOGTAG, CLASSTAG + "Last location found: " + location);
 
   // Display the location
-  titlePosition.setText (R.string.title_last_location);
-  latitude.setText (locationToString (location.getLatitude ()));
-  longitude.setText (locationToString (location.getLongitude ()));
-  locationTime.setText (timeToString (location.getTime ()));
-  framePosition.setVisibility (VISIBLE);
+  //titlePosition.setText (R.string.title_last_location);
+  String text = locationToString (location.getLatitude ());
+  float accuracy = location.getAccuracy ();
+  if (accuracy != 0.0f)
+  {
+    text += " (\u00B1" + // ± - \u00B1
+        String.format (Locale.getDefault (), "%.2f m", accuracy) + ")";
+  }
+  llfLatitude.setText (text);
+  llfLongitude.setText (locationToString (location.getLongitude ()));
+  llfTime.setText (timeToString (location.getTime ()));
+  llfFrame.setVisibility (VISIBLE);
 
   // Enable the get location button
   btnDisplayLocation.setEnabled (true);
@@ -403,6 +422,11 @@ private void handleLocationResultReceived (LocationResult result)
   String msg = CLASSTAG +
       "onLocationAvailability called within handleDisplayLocationRequest";
   Log.v (Constants.LOGTAG, CLASSTAG + "Location result received");
+  Location loc = result.getLastLocation ();
+  clLatitude.setText (locationToString (loc.getLatitude ()));
+  clLongitude.setText (locationToString (loc.getLongitude ()));
+  clTime.setText (timeToString (loc.getTime ()));
+  clFrame.setVisibility (VISIBLE);
 }
 
 private void handleShowEvents ()
