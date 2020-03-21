@@ -33,6 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 import static com.google.android.gms.location.GeofencingRequest.*;
 
@@ -166,6 +167,9 @@ public String getTransitionString (Resources resources, int transition)
   String result;
   switch (transition)
   {
+    case Geofence.GEOFENCE_TRANSITION_DWELL:
+      result = resources.getString (R.string.geofence_event_dwell);
+      break;
     case Geofence.GEOFENCE_TRANSITION_ENTER:
       result = resources.getString (R.string.geofence_event_enter);
       break;
@@ -216,14 +220,15 @@ public void addFences (Activity activity)
   // 50 metre geofence centred on Steve's House
   Geofence fence =  new Geofence.Builder ()
       .setRequestId ("Steve's House")
-      .setCircularRegion (53.324859d, -1.990568d, 50f)
+      .setCircularRegion (53.324859d, -1.990568d, 100f)
       .setExpirationDuration (NEVER_EXPIRE)
       .setTransitionTypes ( Geofence.GEOFENCE_TRANSITION_ENTER |
-          Geofence.GEOFENCE_TRANSITION_EXIT )
+          Geofence.GEOFENCE_TRANSITION_EXIT | GEOFENCE_TRANSITION_DWELL )
+      .setLoiteringDelay (5 * 60 * 1000)  // DWELL fires after 5 minutes
       .build ();
 
   // Build the Geofencing request
-  GeofencingRequest request = new GeofencingRequest. Builder ()
+  GeofencingRequest request = new GeofencingRequest.Builder ()
       .setInitialTrigger (INITIAL_TRIGGER_DWELL | INITIAL_TRIGGER_ENTER |
           INITIAL_TRIGGER_EXIT)
       .addGeofence (fence)

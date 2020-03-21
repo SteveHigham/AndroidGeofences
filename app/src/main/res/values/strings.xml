@@ -11,6 +11,7 @@
     <string name="failed_with_unexpected_error">
         Failed with unexpected error: %1$s
     </string>
+    <string name="geofence_event_dwell">DWELL</string>
     <string name="geofence_event_enter">ENTER</string>
     <string name="geofence_event_exit">EXIT</string>
     <string name="geofence_event_unknown">UNKNOWN</string>

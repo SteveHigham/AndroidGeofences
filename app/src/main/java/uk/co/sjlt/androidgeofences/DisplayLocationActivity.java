@@ -423,7 +423,14 @@ private void handleLocationResultReceived (LocationResult result)
       "onLocationAvailability called within handleDisplayLocationRequest";
   Log.v (Constants.LOGTAG, CLASSTAG + "Location result received");
   Location loc = result.getLastLocation ();
-  clLatitude.setText (locationToString (loc.getLatitude ()));
+  String text = locationToString (loc.getLatitude ());
+  float accuracy = loc.getAccuracy ();
+  if (accuracy != 0.0f)
+  {
+    text += " (\u00B1" + // ± - \u00B1
+      String.format (Locale.getDefault (), "%.2f m", accuracy) + ")";
+  }
+  clLatitude.setText (text);
   clLongitude.setText (locationToString (loc.getLongitude ()));
   clTime.setText (timeToString (loc.getTime ()));
   clFrame.setVisibility (VISIBLE);
