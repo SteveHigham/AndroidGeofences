@@ -37,6 +37,16 @@
         </activity>
 
         <receiver android:name=".GeofenceBroadcastReceiver" />
+
+        <!--
+            API Key for viewing location in a map
+            This is held in
+            AndroidGeofencing/../secrets/AndroidGeofences.properties
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${ANDROID_GEO_API_KEY}"/>
+
     </application>
 
 </manifest>

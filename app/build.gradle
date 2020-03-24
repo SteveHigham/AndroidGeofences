@@ -3,6 +3,11 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '3.3.0'
 }
 
+// Local secrets which should not be added into source control
+def secretsPropsFile = rootProject.file ("../secrets/AndroidGeofences.properties")
+def secretsProps = new Properties ()
+secretsProps.load (new FileInputStream (secretsPropsFile))
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -13,6 +18,10 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+
+        // Make secret API keys available
+        manifestPlaceholders =
+                [ANDROID_GEO_API_KEY: secretsProps ['ANDROID-GEO-API_KEY']]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,14 +50,14 @@ dependencies {
 
     // View dependencies to display Fence Events
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     // Geofencing dependencies for Google Play
-    implementation 'com.google.android.gms:play-services-base:17.1.0'
+    implementation 'com.google.android.gms:play-services-base:17.2.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
 
     // Standard dependencies from the new project wizard
-    implementation 'com.google.android.gms:play-services-base:17.1.0'
+    // implementation 'com.google.android.gms:play-services-base:17.1.0'
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
