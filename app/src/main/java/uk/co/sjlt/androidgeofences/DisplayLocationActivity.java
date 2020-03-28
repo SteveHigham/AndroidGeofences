@@ -508,7 +508,9 @@ private void initialiseGeofencing ()
 
 private void showLocationOnMap (Location loc)
 {
-  Intent intent = new Intent (this, ShowLocationActivity.class);
+  Intent intent = new Intent (this, ShowLocationActivity.class)
+      .putExtra ("Location", loc);
+
   startActivity (intent);
 }
 
