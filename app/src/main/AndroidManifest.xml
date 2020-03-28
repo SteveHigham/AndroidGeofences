@@ -38,6 +38,10 @@
 
         <receiver android:name=".GeofenceBroadcastReceiver" />
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <!--
             API Key for viewing location in a map
             This is held in
