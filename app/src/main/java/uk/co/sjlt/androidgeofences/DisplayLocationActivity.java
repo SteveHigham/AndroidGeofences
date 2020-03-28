@@ -475,7 +475,7 @@ private void handleShowCurrentLocation ()
         "Ignoring show current location request as no location defined" );
   } else
   {
-    // Todo - move to ShowLocationActivity
+    showLocationOnMap (currentLocation);
   }
 }
 
@@ -490,7 +490,7 @@ private void handleShowLastLocationFound ()
         "Ignoring show last location found request as no location defined" );
   } else
   {
-    // Todo - move to ShowLocationActivity
+    showLocationOnMap (lastLocationFound);
   }
 }
 
@@ -504,6 +504,12 @@ private void initialiseGeofencing ()
 {
   GeofencesApplication app = (GeofencesApplication) getApplication ();
   app.initGeofencing (this);
+}
+
+private void showLocationOnMap (Location loc)
+{
+  Intent intent = new Intent (this, ShowLocationActivity.class);
+  startActivity (intent);
 }
 
 }
