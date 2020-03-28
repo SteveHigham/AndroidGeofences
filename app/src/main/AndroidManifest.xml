@@ -18,14 +18,14 @@
         <activity android:name=".RequestPermissionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity> <!-- launchMode="singleTask" required for static Handler -->
 
-        <!-- launchMode="singleTask" required for static Handler -->
         <activity
             android:name=".DisplayLocationActivity"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask" />
 
         <activity
             android:name=".FenceEventsActivity"
@@ -36,12 +36,13 @@
                 android:value=".DisplayLocationActivity" />
         </activity>
 
+        <activity android:name=".ShowLocationActivity" />
+
         <receiver android:name=".GeofenceBroadcastReceiver" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <!--
             API Key for viewing location in a map
             This is held in
@@ -49,8 +50,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${ANDROID_GEO_API_KEY}"/>
-
+            android:value="${ANDROID_GEO_API_KEY}" />
     </application>
 
 </manifest>
