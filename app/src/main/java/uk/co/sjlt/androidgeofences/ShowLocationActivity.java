@@ -6,6 +6,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -55,6 +57,29 @@ public void onMapReady (GoogleMap googleMap)
   googleMap.addMarker (options);
   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng (loc);
   googleMap.moveCamera (cameraUpdate);
+}
+
+@Override
+protected void onResume ()
+{
+  super.onResume ();
+  Log.v (Constants.LOGTAG, CLASSTAG + "onResume called");
+
+  // Check Google Play Services is installed, up to date and enabled.
+
+  int availability = GoogleApiAvailability.getInstance ()
+      .isGooglePlayServicesAvailable (this);
+  Log.v ( Constants.LOGTAG,
+      CLASSTAG + "GooglePlayServices - Availability: " + availability );
+  if (availability == ConnectionResult.SUCCESS)
+  {
+    Log.v (Constants.LOGTAG, CLASSTAG + "Google play services available");
+
+  } else
+  {
+    Log.v (Constants.LOGTAG, CLASSTAG + "Google play services not available");
+    // TODO - Fill in the "update google play services" code.
+  }
 }
 
 }
