@@ -1,0 +1,61 @@
+Android Geofences - Todo.txt
+===================
+Whatever I do I seem to get the following log entries and a blank map whenever
+I try and show a point.
+
+2020-04-05 15:45:10.771 16557-16912/uk.co.sjlt.androidgeofences E/Google Maps Android API: Authorization failure.  Please see https://developers.google.com/maps/documentation/android-api/start for how to correctly set up the map.
+
+2020-04-05 15:45:10.777 16557-16912/uk.co.sjlt.androidgeofences E/Google Maps Android API: In the Google Developer Console (https://console.developers.google.com)
+    Ensure that the "Google Maps Android API v2" is enabled.
+    Ensure that the following Android Key exists:
+    	API Key: "AIzaSyDKktG62x0tYl4AStouR48DwwXEdRI-qac"
+    	Android Application (<cert_fingerprint>;<package_name>): 8A:DF:45:3E:BB:5A:6A:D0:44:7C:C7:10:F8:85:DD:A6:4F:86:CC:3C;uk.co.sjlt.androidgeofences
+
+Part of Maps SDK for Android -
+https://developers.google.com/maps/documentation/android-sdk/start
+----------------------------------------------------------
+
+We need an API key with a restriction for Android Apps.
+
+
+https://developers.google.com/maps/gmp-get-started
+--------------------------------------------
+
+To get started with Google Maps Platform you need to: -
+
+1)     Create a billing account.
+2)     Create a project
+3)     Enable one or more APIs or SDKs
+4)     Get, add and restrict an API key.
+
+Support Request
+===========
+Trying to raise a support request at:
+https://console.cloud.google.com/google/maps-apis/support?project=android-geofences-272018&folder=&organizationId=
+
+Issue type: Technical
+Severity:     1 - Service unusable in prod (none are suitable)
+
+Issue Description
+-----
+Whenever I try to use Google Maps Android SDK I get the following log entries:
+
+2020-04-05 18:16:15.737 14686-14781/uk.co.sjlt.androidgeofences E/Google Maps Android API: Authorization failure.  Please see https://developers.google.com/maps/documentation/android-api/start for how to correctly set up the map.
+2020-04-05 18:16:15.739 14686-14781/uk.co.sjlt.androidgeofences E/Google Maps Android API: In the Google Developer Console (https://console.developers.google.com)
+    Ensure that the "Google Maps Android API v2" is enabled.
+    Ensure that the following Android Key exists:
+    	API Key: "AIzaSyDKktG62x0tYl4AStouR48DwwXEdRI-qac"
+    	Android Application (<cert_fingerprint>;<package_name>): 8A:DF:45:3E:BB:5A:6A:D0:44:7C:C7:10:F8:85:DD:A6:4F:86:CC:3C;uk.co.sjlt.androidgeofences
+
+I am using my Google Cloud Platform account
+Steve Higham (stevehighamuk@gmail.com)
+This is linked to My Billing Account, 018188-25E167-FFF78E which is in credit
+I am trying to use the above API Key which is present in the app manifest and my GCP account.
+This API key is linked under my GCP account to package uk.co.sjlt.androidgeofences using SHA1 fingerprint 8A:DF:45:3E:BB:5A:6A:D0:44:7C:C7:10:F8:85:DD:A6:4F:86:CC:3C.
+Maps SDK for Android is enabled in my Android Geofences project.
+
+Please help me diagnose what I need to do to get this to work. I'm currently testing in an Android Studio emulator with Play Services installed. Whan I call isGooglePlayServicesAvailable () I get a zero response (ConnectionResult.SUCCESS).
+
+-----
+
+Additional recipients: steve@sjlt.co.uk
