@@ -53,6 +53,8 @@
 
     <!-- Display Locations Screen -->
 
+    <string name="title_activity_display_location">Display Location</string>
+
     <string name="menu_show_events">Show Events</string>
 
     <string name="status_label">Status</string>
@@ -71,6 +73,10 @@
     <string name="longitude_label">Longitude</string>
     <string name="time_label">Time</string>
     <string name="title_current_position">Current Position</string>
+
+    <!-- Show Location Screen (Using Google Maps) -->
+
+    <string name="title_activity_show_location">Show Location</string>
 
     <!-- Display Fence Events Screen -->
 
