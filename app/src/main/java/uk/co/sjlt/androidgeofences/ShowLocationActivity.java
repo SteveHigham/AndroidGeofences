@@ -2,6 +2,7 @@ package uk.co.sjlt.androidgeofences;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +29,7 @@ private static final String CLASSTAG =
     " " + ShowLocationActivity.class.getSimpleName () + " ";
 
 private Location displayLocation;
+private String   displayName;
 
 @Override
 protected void onCreate (Bundle savedInstanceState)
@@ -35,9 +37,11 @@ protected void onCreate (Bundle savedInstanceState)
   super.onCreate (savedInstanceState);
 
   // Get the location to display and log it
-  displayLocation = getIntent ().getParcelableExtra ("Location");
+  Intent intent = getIntent ();
+  displayName     = intent.getStringExtra ("Name");
+  displayLocation = intent.getParcelableExtra ("Location");
   Log.v ( Constants.LOGTAG, CLASSTAG + "onCreate called with Location: " +
-      displayLocation );
+      displayLocation + " Name: " + displayName );
 
   setContentView (R.layout.activity_show_location);
   SupportMapFragment fragment =
@@ -50,10 +54,10 @@ protected void onCreate (Bundle savedInstanceState)
 public void onMapReady (GoogleMap googleMap)
 {
   Log.v ( Constants.LOGTAG, CLASSTAG + "onMapReady called for Location: " +
-      displayLocation );
+      displayLocation + " with Name: " + displayName );
   LatLng loc = new LatLng ( displayLocation.getLatitude (),
       displayLocation.getLongitude () );
-  MarkerOptions options = new MarkerOptions ().position (loc).title ("Location");
+  MarkerOptions options = new MarkerOptions ().position (loc).title (displayName);
   googleMap.addMarker (options);
   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng (loc);
   googleMap.moveCamera (cameraUpdate);

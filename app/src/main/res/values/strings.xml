@@ -77,6 +77,8 @@
     <!-- Show Location Screen (Using Google Maps) -->
 
     <string name="title_activity_show_location">Show Location</string>
+    <string name="current_position">Current position</string>
+    <string name="last_location">Last Location</string>
 
     <!-- Display Fence Events Screen -->
 

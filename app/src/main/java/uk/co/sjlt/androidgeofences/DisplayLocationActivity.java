@@ -475,7 +475,8 @@ private void handleShowCurrentLocation ()
         "Ignoring show current location request as no location defined" );
   } else
   {
-    showLocationOnMap (currentLocation);
+    showLocationOnMap ( getResources ().getString (R.string.current_position),
+        currentLocation );
   }
 }
 
@@ -490,7 +491,8 @@ private void handleShowLastLocationFound ()
         "Ignoring show last location found request as no location defined" );
   } else
   {
-    showLocationOnMap (lastLocationFound);
+    showLocationOnMap ( getResources ().getString (R.string.last_location),
+        lastLocationFound );
   }
 }
 
@@ -506,11 +508,11 @@ private void initialiseGeofencing ()
   app.initGeofencing (this);
 }
 
-private void showLocationOnMap (Location loc)
+private void showLocationOnMap (String name, Location loc)
 {
   Intent intent = new Intent (this, ShowLocationActivity.class)
-      .putExtra ("Location", loc);
-
+      .putExtra ("Location", loc)
+      .putExtra ("Name", name);
   startActivity (intent);
 }
 
