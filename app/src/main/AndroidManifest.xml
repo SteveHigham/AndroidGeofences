@@ -52,13 +52,10 @@
             API Key for viewing location in a map
             This is held in
             AndroidGeofencing/../secrets/AndroidGeofences.properties
-            Note that manifestPlaceholders do not work in manifests!
-            They do work in string resource files so we need an additional
-            level of indirection.
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="${ANDROID_GEO_API_KEY}" />
     </application>
 
 </manifest>
