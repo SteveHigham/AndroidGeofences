@@ -59,8 +59,7 @@ public void onMapReady (GoogleMap googleMap)
       displayLocation.getLongitude () );
   MarkerOptions options = new MarkerOptions ().position (loc).title (displayName);
   googleMap.addMarker (options);
-  CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng (loc);
-  googleMap.moveCamera (cameraUpdate);
+  googleMap.moveCamera (CameraUpdateFactory.newLatLngZoom (loc, 15f));
 }
 
 @Override
