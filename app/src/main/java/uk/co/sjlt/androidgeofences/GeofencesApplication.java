@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.Task;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.Getter;
@@ -62,6 +63,12 @@ public enum Status { DEFAULT, FENCES_ADDED, FENCES_FAILED, FENCES_REMOVED }
 
 private FusedLocationProviderClient fusedLocationClient;
 private GeofencingClient geofencingClient;
+
+/**
+ * I store the fences in this array.
+ */
+@Getter
+ArrayList<Geofence> fences;
 
 /**
  * I store events in this array as additions will come in from the
@@ -126,8 +133,21 @@ public void onCreate ()
 {
   super.onCreate ();
   Log.v (Constants.LOGTAG, CLASSTAG + "Application onCreate called");
+
   status = Status.DEFAULT;
   events = new CopyOnWriteArrayList<> ();
+  fences = new ArrayList<> ();
+
+  // 50 metre geofence centred on Steve's House
+  Geofence fence =  new Geofence.Builder ()
+      .setRequestId ("Steve's House")
+      .setCircularRegion (53.324859d, -1.990568d, 100f)
+      .setExpirationDuration (NEVER_EXPIRE)
+      .setTransitionTypes ( Geofence.GEOFENCE_TRANSITION_ENTER |
+          Geofence.GEOFENCE_TRANSITION_EXIT | GEOFENCE_TRANSITION_DWELL )
+      .setLoiteringDelay (5 * 60 * 1000)  // DWELL fires after 5 minutes
+      .build ();
+  fences.add (fence);
 }
 
 public Task<Location> getLastLocation ()
@@ -217,42 +237,35 @@ public void initGeofencing (Activity activity)
 
 public void addFences (Activity activity)
 {
-  // 50 metre geofence centred on Steve's House
-  Geofence fence =  new Geofence.Builder ()
-      .setRequestId ("Steve's House")
-      .setCircularRegion (53.324859d, -1.990568d, 100f)
-      .setExpirationDuration (NEVER_EXPIRE)
-      .setTransitionTypes ( Geofence.GEOFENCE_TRANSITION_ENTER |
-          Geofence.GEOFENCE_TRANSITION_EXIT | GEOFENCE_TRANSITION_DWELL )
-      .setLoiteringDelay (5 * 60 * 1000)  // DWELL fires after 5 minutes
-      .build ();
+  for (Geofence fence : fences)
+  {
+    // Build the Geofencing request
+    GeofencingRequest request = new GeofencingRequest.Builder ()
+        .setInitialTrigger (INITIAL_TRIGGER_DWELL | INITIAL_TRIGGER_ENTER |
+            INITIAL_TRIGGER_EXIT)
+        .addGeofence (fence)
+        .build ();
 
-  // Build the Geofencing request
-  GeofencingRequest request = new GeofencingRequest.Builder ()
-      .setInitialTrigger (INITIAL_TRIGGER_DWELL | INITIAL_TRIGGER_ENTER |
-          INITIAL_TRIGGER_EXIT)
-      .addGeofence (fence)
-      .build ();
-
-  // Add the geofence
-  dialogActivity = activity;
-  geofencingClient.addGeofences (request, pendingIntent)
-      .addOnSuccessListener (activity, new OnSuccessListener<Void> ()
-      {
-        @Override
-        public void onSuccess (Void aVoid)
+    // Add the geofence
+    dialogActivity = activity;
+    geofencingClient.addGeofences (request, pendingIntent)
+        .addOnSuccessListener (activity, new OnSuccessListener<Void> ()
         {
-          handleAddingFenceSucceeded ();
-        }
-      })
-      .addOnFailureListener (activity, new OnFailureListener ()
-      {
-        @Override
-        public void onFailure (@NotNull Exception e)
+          @Override
+          public void onSuccess (Void aVoid)
+          {
+            handleAddingFenceSucceeded ();
+          }
+        })
+        .addOnFailureListener (activity, new OnFailureListener ()
         {
-          handleAddingFenceFailed (e);
-        }
-      });
+          @Override
+          public void onFailure (@NotNull Exception e)
+          {
+            handleAddingFenceFailed (e);
+          }
+        });
+  }
 }
 
 public Task<Void> requestSingleLocation (LocationCallback callback)

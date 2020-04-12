@@ -9,11 +9,13 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -51,15 +53,28 @@ protected void onCreate (Bundle savedInstanceState)
 }
 
 @Override
-public void onMapReady (GoogleMap googleMap)
+public void onMapReady (GoogleMap map)
 {
   Log.v ( Constants.LOGTAG, CLASSTAG + "onMapReady called for Location: " +
       displayLocation + " with Name: " + displayName );
-  LatLng loc = new LatLng ( displayLocation.getLatitude (),
-      displayLocation.getLongitude () );
-  MarkerOptions options = new MarkerOptions ().position (loc).title (displayName);
-  googleMap.addMarker (options);
-  googleMap.moveCamera (CameraUpdateFactory.newLatLngZoom (loc, 15f));
+
+  // Show the indicated location
+  LatLng location =
+      new LatLng ( displayLocation.getLatitude (),
+          displayLocation.getLongitude () );
+  showLocation (map, location, displayLocation.getAccuracy ());
+
+  // Show the fences
+  // Todo - This doesn't work as Geofence doesn't make the location available.
+  // I need a specialised Fence class which can be used to build the fence
+  // AND be queried for metadata such as the fence location, size and ID.
+  for (Geofence fence: ((GeofencesApplication) getApplication ()).getFences ())
+  {
+
+  }
+
+  // Move the camera to an appropriate position and zoom
+  map.moveCamera (CameraUpdateFactory.newLatLngZoom (location, 15f));
 }
 
 @Override
@@ -83,6 +98,23 @@ protected void onResume ()
     Log.v (Constants.LOGTAG, CLASSTAG + "Google play services not available");
     // TODO - Fill in the "update google play services" code.
   }
+}
+
+private void showLocation (GoogleMap map, LatLng location, Float accuracy)
+{
+  // Show the location as a marker
+  MarkerOptions mOptions = new MarkerOptions ().position (location).title (displayName);
+  map.addMarker (mOptions);
+
+  // If we have an accuracy add in a circle to display
+  if (accuracy > 1f)
+  {
+    CircleOptions cOptions = new CircleOptions ()
+        .center (location)
+        .radius (accuracy);
+    map.addCircle (cOptions);
+  }
+
 }
 
 }
