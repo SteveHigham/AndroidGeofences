@@ -1,4 +1,4 @@
-package uk.co.sjlt.androidgeofences;
+package uk.co.sjlt.androidgeofences.ui;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -31,6 +31,9 @@ import java.util.Date;
 import java.util.Locale;
 
 import lombok.Getter;
+import uk.co.sjlt.androidgeofences.Constants;
+import uk.co.sjlt.androidgeofences.GeofencesApplication;
+import uk.co.sjlt.androidgeofences.R;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;

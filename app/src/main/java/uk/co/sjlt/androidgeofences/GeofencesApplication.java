@@ -33,6 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.Getter;
 import lombok.Setter;
+import uk.co.sjlt.androidgeofences.model.FenceEvent;
+import uk.co.sjlt.androidgeofences.ui.DisplayLocationActivity;
 
 import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;

@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".RequestPermissionsActivity">
+        <activity android:name=".ui.RequestPermissionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -26,21 +26,21 @@
         </activity> <!-- launchMode="singleTask" required for static Handler -->
 
         <activity
-            android:name=".DisplayLocationActivity"
+            android:name=".ui.DisplayLocationActivity"
             android:label="@string/title_activity_display_location"
             android:launchMode="singleTask" />
 
         <activity
-            android:name=".FenceEventsActivity"
+            android:name=".ui.FenceEventsActivity"
             android:label="@string/title_activity_fence_events"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".DisplayLocationActivity" />
+                android:value=".ui.DisplayLocationActivity" />
         </activity>
 
         <activity
-            android:name=".ShowLocationActivity"
+            android:name=".ui.ShowLocationActivity"
             android:label="@string/title_activity_show_location" />
 
         <receiver android:name=".GeofenceBroadcastReceiver" />

@@ -1,8 +1,8 @@
 package uk.co.sjlt.androidgeofences;
 
-class Constants
+public class Constants
 {
-static final String LOGTAG = "AndroidGeofences ";
+public static final String LOGTAG = "AndroidGeofences ";
 }
 
 // End of class

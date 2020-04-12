@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="uk.co.sjlt.androidgeofences.FenceEventsActivity">
+    tools:context="uk.co.sjlt.androidgeofences.ui.FenceEventsActivity">
 
 <item
     android:id="@+id/menu_show_events"

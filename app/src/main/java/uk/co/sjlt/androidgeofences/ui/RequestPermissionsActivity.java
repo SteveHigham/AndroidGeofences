@@ -1,4 +1,4 @@
-package uk.co.sjlt.androidgeofences;
+package uk.co.sjlt.androidgeofences.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -17,6 +17,10 @@ import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import uk.co.sjlt.androidgeofences.Constants;
+import uk.co.sjlt.androidgeofences.GeofencesApplication;
+import uk.co.sjlt.androidgeofences.R;
 
 import static android.Manifest.permission.*;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;

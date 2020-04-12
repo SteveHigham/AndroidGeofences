@@ -14,6 +14,9 @@ import com.google.android.gms.location.GeofencingEvent;
 import java.util.Date;
 import java.util.List;
 
+import uk.co.sjlt.androidgeofences.model.FenceEvent;
+import uk.co.sjlt.androidgeofences.ui.DisplayLocationActivity;
+
 public class GeofenceBroadcastReceiver extends BroadcastReceiver
 {
 

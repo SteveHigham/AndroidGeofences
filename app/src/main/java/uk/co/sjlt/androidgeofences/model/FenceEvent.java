@@ -1,4 +1,4 @@
-package uk.co.sjlt.androidgeofences;
+package uk.co.sjlt.androidgeofences.model;
 
 import java.util.Date;
 
@@ -8,7 +8,7 @@ import lombok.Getter;
 /**
  * Class to store the relavent details aboiut a Geofencing Event
  */
-class FenceEvent
+public class FenceEvent
 {
 @Getter
 private final @NonNull Date timestamp;
@@ -19,7 +19,7 @@ private final @NonNull String fence;
 @Getter
 private final int event;
 
-FenceEvent (@NonNull Date t, @NonNull String f, int i)
+public FenceEvent (@NonNull Date t, @NonNull String f, int i)
 {
   timestamp = t;
   fence = f;

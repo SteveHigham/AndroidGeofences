@@ -1,4 +1,4 @@
-package uk.co.sjlt.androidgeofences;
+package uk.co.sjlt.androidgeofences.ui;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -9,8 +9,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
-import java.util.List;
+import uk.co.sjlt.androidgeofences.Constants;
+import uk.co.sjlt.androidgeofences.GeofencesApplication;
+import uk.co.sjlt.androidgeofences.R;
 
 public class FenceEventsActivity extends AppCompatActivity
 {

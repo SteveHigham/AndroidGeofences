@@ -1,4 +1,4 @@
-package uk.co.sjlt.androidgeofences;
+package uk.co.sjlt.androidgeofences.ui;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+
+import uk.co.sjlt.androidgeofences.Constants;
+import uk.co.sjlt.androidgeofences.model.FenceEvent;
+import uk.co.sjlt.androidgeofences.GeofencesApplication;
+import uk.co.sjlt.androidgeofences.R;
 
 public class FenceEventsAdapter extends RecyclerView.Adapter<FenceEventsAdapter.EventViewHolder>
 {
@@ -53,7 +58,8 @@ private @NonNull List<FenceEvent> events;
 private SimpleDateFormat timeFormatter;
 
 
-private @NonNull GeofencesApplication app;
+private @NonNull
+GeofencesApplication app;
 
 @Override
 public int getItemCount ()
