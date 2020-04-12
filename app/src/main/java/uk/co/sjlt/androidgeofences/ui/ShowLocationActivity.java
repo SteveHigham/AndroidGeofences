@@ -9,18 +9,19 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
 
 import uk.co.sjlt.androidgeofences.Constants;
 import uk.co.sjlt.androidgeofences.GeofencesApplication;
 import uk.co.sjlt.androidgeofences.R;
+import uk.co.sjlt.androidgeofences.model.Fence;
+import uk.co.sjlt.androidgeofences.model.FenceMap;
 
 /**
  * An activity that displays a Google map with a marker (pin) to indicate a
@@ -56,28 +57,23 @@ protected void onCreate (Bundle savedInstanceState)
 }
 
 @Override
-public void onMapReady (GoogleMap map)
+public void onMapReady (GoogleMap gMap)
 {
   Log.v ( Constants.LOGTAG, CLASSTAG + "onMapReady called for Location: " +
       displayLocation + " with Name: " + displayName );
 
-  // Show the indicated location
+  // Show the location and fences
+  List<Fence> fences =
+      ((GeofencesApplication) getApplication ()).getFences ();
+  new FenceMap (gMap)
+      .showLocation (displayName, displayLocation)
+      .showFences (fences);
+
+  // Move the camera to an appropriate position and zoom
   LatLng location =
       new LatLng ( displayLocation.getLatitude (),
           displayLocation.getLongitude () );
-  showLocation (map, location, displayLocation.getAccuracy ());
-
-  // Show the fences
-  // Todo - This doesn't work as Geofence doesn't make the location available.
-  // I need a specialised Fence class which can be used to build the fence
-  // AND be queried for metadata such as the fence location, size and ID.
-  for (Geofence fence: ((GeofencesApplication) getApplication ()).getFences ())
-  {
-
-  }
-
-  // Move the camera to an appropriate position and zoom
-  map.moveCamera (CameraUpdateFactory.newLatLngZoom (location, 15f));
+  gMap.moveCamera (CameraUpdateFactory.newLatLngZoom (location, 15f));
 }
 
 @Override
@@ -103,22 +99,6 @@ protected void onResume ()
   }
 }
 
-private void showLocation (GoogleMap map, LatLng location, Float accuracy)
-{
-  // Show the location as a marker
-  MarkerOptions mOptions = new MarkerOptions ().position (location).title (displayName);
-  map.addMarker (mOptions);
-
-  // If we have an accuracy add in a circle to display
-  if (accuracy > 1f)
-  {
-    CircleOptions cOptions = new CircleOptions ()
-        .center (location)
-        .radius (accuracy);
-    map.addCircle (cOptions);
-  }
-
 }
 
-}
 // End of class.

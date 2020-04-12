@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -33,11 +34,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import uk.co.sjlt.androidgeofences.model.Fence;
 import uk.co.sjlt.androidgeofences.model.FenceEvent;
 import uk.co.sjlt.androidgeofences.ui.DisplayLocationActivity;
 
-import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL;
-import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 import static com.google.android.gms.location.GeofencingRequest.*;
 
 /**
@@ -70,7 +71,7 @@ private GeofencingClient geofencingClient;
  * I store the fences in this array.
  */
 @Getter
-ArrayList<Geofence> fences;
+ArrayList<Fence> fences;
 
 /**
  * I store events in this array as additions will come in from the
@@ -141,14 +142,8 @@ public void onCreate ()
   fences = new ArrayList<> ();
 
   // 50 metre geofence centred on Steve's House
-  Geofence fence =  new Geofence.Builder ()
-      .setRequestId ("Steve's House")
-      .setCircularRegion (53.324859d, -1.990568d, 100f)
-      .setExpirationDuration (NEVER_EXPIRE)
-      .setTransitionTypes ( Geofence.GEOFENCE_TRANSITION_ENTER |
-          Geofence.GEOFENCE_TRANSITION_EXIT | GEOFENCE_TRANSITION_DWELL )
-      .setLoiteringDelay (5 * 60 * 1000)  // DWELL fires after 5 minutes
-      .build ();
+  Fence fence = Fence.buildCircularFence ( "Steve's House",
+      new LatLng (53.32176d, -1.99047d), 100f);
   fences.add (fence);
 }
 
@@ -158,7 +153,8 @@ public Task<Location> getLastLocation ()
 public Task<LocationAvailability> getLocationAvailability ()
 { return fusedLocationClient.getLocationAvailability (); }
 
-public @NotNull String getStatusText ()
+public @NotNull
+String getStatusText ()
 {
   Log.v (Constants.LOGTAG, CLASSTAG + "Requesting status text for status: " + status);
   int resId;
@@ -239,19 +235,21 @@ public void initGeofencing (Activity activity)
 
 public void addFences (Activity activity)
 {
-  for (Geofence fence : fences)
-  {
-    // Build the Geofencing request
-    GeofencingRequest request = new GeofencingRequest.Builder ()
-        .setInitialTrigger (INITIAL_TRIGGER_DWELL | INITIAL_TRIGGER_ENTER |
-            INITIAL_TRIGGER_EXIT)
-        .addGeofence (fence)
-        .build ();
+  // Create the request builder
+  GeofencingRequest.Builder builder = new GeofencingRequest.Builder ()
+      .setInitialTrigger (INITIAL_TRIGGER_DWELL | INITIAL_TRIGGER_ENTER |
+          INITIAL_TRIGGER_EXIT);
 
-    // Add the geofence
-    dialogActivity = activity;
-    geofencingClient.addGeofences (request, pendingIntent)
-        .addOnSuccessListener (activity, new OnSuccessListener<Void> ()
+  // Add the fences
+  for (Fence fence : fences)
+  {
+    builder.addGeofence (fence.createGeofence ());
+  }
+
+    // Add the geofences
+  dialogActivity = activity;
+  geofencingClient.addGeofences (builder.build (), pendingIntent)
+      .addOnSuccessListener (activity, new OnSuccessListener<Void> ()
         {
           @Override
           public void onSuccess (Void aVoid)
@@ -259,7 +257,7 @@ public void addFences (Activity activity)
             handleAddingFenceSucceeded ();
           }
         })
-        .addOnFailureListener (activity, new OnFailureListener ()
+      .addOnFailureListener (activity, new OnFailureListener ()
         {
           @Override
           public void onFailure (@NotNull Exception e)
@@ -267,7 +265,6 @@ public void addFences (Activity activity)
             handleAddingFenceFailed (e);
           }
         });
-  }
 }
 
 public Task<Void> requestSingleLocation (LocationCallback callback)
