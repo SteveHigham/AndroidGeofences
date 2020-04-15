@@ -8,7 +8,9 @@
 
     <!-- Geofences Application -->
 
-    <string name="failed_with_error_code">Failed with error code %1$d (%2$s)</string>
+    <string name="failed_with_error_code">
+        Failed with error code %1$d (%2$s)
+    </string>
     <string name="failed_with_unexpected_error">
         Failed with unexpected error: %1$s
     </string>
@@ -40,12 +42,31 @@
     <!-- Broadcast Receiver -->
 
     <string name="receiver_log_transition">%1$s event on Fence: %2$s</string>
+    <string name="receiver_transition_notification_entry">
+        You have entered %1$s
+    </string>
+    <string name="receiver_transition_notification_exit">
+        You have left %1$s
+    </string>
+    <string name="receiver_transition_notification_title">
+        Fence crossed
+    </string>
+    <string name="receiver_transition_notification_unknown">
+        Unknown transition code %1$d on fence %2$s
+    </string>
 
     <!-- Request Permissions Screen -->
 
-    <string name="button_request_permissions">Request Location Permissions</string>
+    <string name="channel_name">Fence Crossed Notification</string>
+    <string name="channel_description">You have crossed a geofence</string>
+
+    <string name="button_request_permissions">
+        Request Location Permissions
+    </string>
     <string name="adding_fence_failed_title">Adding Fence(s) Failed</string>
-    <string name="inadequate_permissions_title">Inadequate Application Permissions</string>
+    <string name="inadequate_permissions_title">
+        Inadequate Application Permissions
+    </string>
     <string name="inadequate_permissions_message">
         This application cannot run without requesting its location.
         The application will now terminate.
