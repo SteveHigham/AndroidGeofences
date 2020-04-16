@@ -1,29 +1,83 @@
 Android Geofences - Todo.txt
 ===================
-1) Loading KEY into string resource and then the manifest:
 
-2020-04-11 20:06:09.834 25210-25678/uk.co.sjlt.androidgeofences E/Google Maps Android API: Authorization failure.  Please see https://developers.google.com/maps/documentation/android-api/start for how to correctly set up the map.
-2020-04-11 20:06:09.836 25210-25678/uk.co.sjlt.androidgeofences E/Google Maps Android API: In the Google Developer Console (https://console.developers.google.com)
-    Ensure that the "Google Maps Android API v2" is enabled.
-    Ensure that the following Android Key exists:
-    	API Key: ${ANDROID_GEO_API_KEY}
-    	Android Application (<cert_fingerprint>;<package_name>): 8A:DF:45:3E:BB:5A:6A:D0:44:7C:C7:10:F8:85:DD:A6:4F:86:CC:3C;uk.co.sjlt.androidgeofences
+Notifications.
 
-2) Loading KEY directly into the manifest:
+These are working but after issuing a notification I get spurious
+additional entries into the fence events list.
 
-2020-04-11 20:12:15.514 25827-26335/uk.co.sjlt.androidgeofences E/Google Maps Android API: Authorization failure.  Please see https://developers.google.com/maps/documentation/android-api/start for how to correctly set up the map.
-2020-04-11 20:12:15.515 25827-26335/uk.co.sjlt.androidgeofences E/Google Maps Android API: In the Google Developer Console (https://console.developers.google.com)
-    Ensure that the "Google Maps Android API v2" is enabled.
-    Ensure that the following Android Key exists:
-    	API Key: "AIzaSyCEYHphuVjGPKH5Do8aOe5zmDXUL3XkKQg"
-    	Android Application (<cert_fingerprint>;<package_name>): 8A:DF:45:3E:BB:5A:6A:D0:44:7C:C7:10:F8:85:DD:A6:4F:86:CC:3C;uk.co.sjlt.androidgeofences
+I think this may be a conseqeunece of the intent flags I am using in the
+BroadcastReceiver. I am currently setting
+  Intent.FLAG_ACTIVITY_NEW_TASK |
+      Intent.FLAG_ACTIVITY_CLEAR_TASK
 
-3)  Paste key itself into the manifest
+This is strange because the broadcast sends a message to the
+DisplayLocationActivity which then refreshes its display.
 
-Map displays.
-No log messages.
+The application list of fence crossing events is updated by the
+BroadcastReceiver.
+ I want to see what's happening in a number of use cases as follows.
 
---------------
-Try removing quotes from the secrets file.
-Now the manifest works fine.
+1) 	Application installed but not run.
 
+Expectation: No notifications as the fences have not been registered.
+
+Observations: This is difficult to reproduce on the emulator. However
+repositioning the device whilst the "Request Permissions Screen" is
+showing does not display any notifications.
+
+2)	Application has no permissions.
+
+Expectation: No notifications as the fences have not been registered.
+
+Observations: Confirmed.
+
+3)	      Application has forground permissions only.
+
+Expectation: No notifications as the fences have not been registered.
+
+Observations: Confirmed.
+
+4)	      Application has background permissions.
+
+Expectations: Notifications should be received.
+
+On starting app inside fence one notification is received. This is an
+enter. The show displays the location inside the fence.
+I now close the app and relocate to outside the fence. No event is
+raised. I reopen the app. A notification is received but the display
+notifcation page is not updated. Show events now shows two enter
+events!
+Let's repeat but now relocate whilst Display Location page is visible.
+No immediate response. We will force by get current location.
+Exit event raised according to LogCat. This is confirmed by Fence
+Events.
+
+Now click the notification! returns to Fence Events with no
+problems. Back key exits the application which is reasonable.
+
+Entering the app again triggers an additional exit event! I now have
+the following:
+16:57	ENTER
+16:59	EXIT
+17:02	EXIT
+
+Every time I click a notification I get a spurious exit event. This
+occurs whenever I enter the app. Am I re-registering the fences every
+time?
+
+Additional logging shows Application.addFences called twice on
+startup!
+
+I think both are coming from DisplayLocationActivity. Once from the
+OnCreate call and once from the OnResume call.
+
+OnCreate calls initialiseGeofencing () which calls app.initGeofencing
+(this);
+
+OnResume calls app.addFences (this) iff
+( app.isGeofencingInitialised () &&
+      (app.getStatus () == GeofencesApplication.Status.DEFAULT) )
+
+I have removed the call to addFences from initialiseGeofencing ().
+Problem solved. :-)

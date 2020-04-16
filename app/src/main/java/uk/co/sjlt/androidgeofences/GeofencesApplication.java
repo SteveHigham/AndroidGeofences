@@ -207,6 +207,8 @@ public boolean isGeofencingInitialised () { return geofencingClient != null; }
  * This initialises the Geofencing system.
  * This cannot be done until the relevant permissions have been verified,
  * therefore this is called from the DisplayLocationActivity.
+ * This does not add the fences as that is done later in the process from
+ * DisplayLocationActivity.onResume ()
  */
 public void initGeofencing (Activity activity)
 {
@@ -227,14 +229,14 @@ public void initGeofencing (Activity activity)
           PendingIntent.getBroadcast (this, 0, intent,
               PendingIntent.FLAG_CANCEL_CURRENT);
     }
-
-    // We don't mind adding the same fences multiple times and we need to keep the flow going.
-    addFences (activity);
   }
 }
 
 public void addFences (Activity activity)
 {
+  Log.v ( Constants.LOGTAG, CLASSTAG +
+      "Adding fences via GeofencingRequest.Builder" );
+
   // Create the request builder
   GeofencingRequest.Builder builder = new GeofencingRequest.Builder ()
       .setInitialTrigger (INITIAL_TRIGGER_DWELL | INITIAL_TRIGGER_ENTER |
