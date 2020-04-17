@@ -1,5 +1,2 @@
 # AndroidGeofences
-
-Experimenting with Google PLay Android Geofences.
-Following example documented at:
-<https://developer.android.com/training/location/geofencing>
+Sample Java source code for experimenting with geofencing a location API's.
